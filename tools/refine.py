@@ -15,9 +15,8 @@ def main(path):
                 face_count = len(model.faces)
                 if vertex_count < LOWER_LIMIT or face_count < LOWER_LIMIT:
                     refined_model = model.subdivide()
-                    refined_path = os.path.splitext(full_path)[0] + '.obj'
-                    refined_model.export(refined_path)
-                    print(f"Refined {full_path} and saved to {refined_path}")
+                    refined_model.export(full_path)
+                    print(f"Refined {full_path}")
 
 if __name__ == "__main__":
     if len(sys.argv) > 1:
