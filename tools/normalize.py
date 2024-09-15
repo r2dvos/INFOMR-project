@@ -1,8 +1,9 @@
 import sys
 import os
 from vedo import load, write
+from vedo import Mesh
 
-def normalize_shape(shape):
+def normalize_shape(shape: Mesh) -> Mesh:
     barycenter = shape.center_of_mass()
     shape.vertices = (shape.vertices - barycenter)
 
@@ -11,7 +12,7 @@ def normalize_shape(shape):
     shape.scale(1 / max_bound)
     return shape
 
-def main(path):
+def main(path: str) -> None:
     for root, _, files in os.walk(path):
         for file in files:
             if file.endswith('.obj'):

@@ -4,7 +4,7 @@ import trimesh
 
 LOWER_LIMIT = 100
 
-def main(path):
+def main(path: str) -> None:
     for root, _, files in os.walk(path):
         for file in files:
             if file.endswith('.obj'):
