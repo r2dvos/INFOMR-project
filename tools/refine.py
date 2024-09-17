@@ -13,8 +13,16 @@ def main(path: str) -> None:
                 
                 vertex_count = len(model.vertices)
                 face_count = len(model.faces)
-                if vertex_count < LOWER_LIMIT or face_count < LOWER_LIMIT:
+                refined_model = None
+                while vertex_count < LOWER_LIMIT or face_count < LOWER_LIMIT:
                     refined_model = model.subdivide()
+                    new_vertex_count = len(refined_model.vertices)
+                    new_face_count = len(refined_model.faces)
+                    if new_vertex_count == vertex_count or new_face_count == face_count:
+                        break
+                    vertex_count = new_vertex_count
+                    face_count = new_face_count
+                if refined_model is not None:
                     refined_model.export(full_path)
                     print(f"Refined {full_path}")
 
