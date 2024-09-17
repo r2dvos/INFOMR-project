@@ -49,6 +49,11 @@ def main(path: str, output_csv: str) -> None:
     df = pd.DataFrame(results_array, columns=columns)
     df.to_csv(output_csv, index=False)
     print(f"Results saved to {output_csv}")
+    
+    avg_vertices = df["Number of Vertices"].astype(int).mean()
+    avg_faces = df["Number of Faces"].astype(int).mean()
+    print(f"Average number of vertices: {avg_vertices}")
+    print(f"Average number of faces: {avg_faces}")
 
 if __name__ == "__main__":
     if len(sys.argv) > 2:
