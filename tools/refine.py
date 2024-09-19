@@ -1,30 +1,40 @@
 import sys
 import os
-import trimesh
+from vedo import load, write, Mesh
 
-LOWER_LIMIT = 100
+TARGET: int = 5000
+TARGET_RANGE: int = 500
+
+def decimate(shape: Mesh) -> Mesh:
+    vertex_count = len(shape.vertices)
+    while vertex_count > TARGET + TARGET_RANGE:
+        shape = shape.decimate(0.9)
+        vertex_count = len(shape.vertices)
+    return shape
+
+def subdivide(shape: Mesh) -> Mesh:
+    vertex_count = len(shape.vertices)
+    while vertex_count < TARGET - TARGET_RANGE:
+        shape = shape.subdivide(n = 1, method = 4)
+        vertex_count = len(shape.vertices)
+    #return decimate(shape)
+    return shape
 
 def main(path: str) -> None:
     for root, _, files in os.walk(path):
         for file in files:
             if file.endswith('.obj'):
                 full_path = os.path.join(root, file)
-                model = trimesh.load(full_path)
-                
+                model = load(full_path)
+
                 vertex_count = len(model.vertices)
-                face_count = len(model.faces)
-                refined_model = None
-                while vertex_count < LOWER_LIMIT or face_count < LOWER_LIMIT:
-                    refined_model = model.subdivide()
-                    new_vertex_count = len(refined_model.vertices)
-                    new_face_count = len(refined_model.faces)
-                    if new_vertex_count == vertex_count or new_face_count == face_count:
-                        break
-                    vertex_count = new_vertex_count
-                    face_count = new_face_count
-                if refined_model is not None:
-                    refined_model.export(full_path)
-                    print(f"Refined {full_path}")
+                if vertex_count > TARGET + TARGET_RANGE:
+                    refined_model = decimate(model)
+                elif vertex_count < TARGET - TARGET_RANGE:
+                    refined_model = subdivide(model)
+                else:
+                    refined_model = model
+                write(refined_model, full_path)
 
 if __name__ == "__main__":
     if len(sys.argv) > 1:
