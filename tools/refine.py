@@ -8,16 +8,17 @@ TARGET_RANGE: int = 500
 def decimate(shape: Mesh) -> Mesh:
     vertex_count = len(shape.vertices)
     while vertex_count > TARGET + TARGET_RANGE:
-        shape = shape.decimate(0.9)
+        shape = shape.decimate(0.8)
         vertex_count = len(shape.vertices)
     return shape
 
-def subdivide(shape: Mesh) -> Mesh:
-    vertex_count = len(shape.vertices)
-    while vertex_count < TARGET - TARGET_RANGE:
-        shape = shape.subdivide(n = 1, method = 4)
+def subdivide(shape: Mesh, passes: int = 1) -> Mesh:
+    for _ in range(passes):
         vertex_count = len(shape.vertices)
-    #return decimate(shape)
+        while vertex_count < 2 * TARGET:
+            shape = shape.subdivide(n = 1, method = 4)
+            vertex_count = len(shape.vertices)
+        shape = decimate(shape)
     return shape
 
 def main(path: str) -> None:
@@ -35,6 +36,8 @@ def main(path: str) -> None:
                 else:
                     refined_model = model
                 write(refined_model, full_path)
+                print(f"Refined {full_path}")
+                exit()
 
 if __name__ == "__main__":
     if len(sys.argv) > 1:
