@@ -1,7 +1,8 @@
 import os
+import sys
 import numpy as np
 import pandas as pd
-import sys
+import matplotlib.pyplot as plt
 from vedo import load
 
 def get_shape_class(file_path: str) -> str:
@@ -74,6 +75,12 @@ def analyze(input_csv: str) -> None:
 
     print("~~\n")
 
+    plt.hist(df['Number of Vertices'], bins=500)
+    plt.title("Vertices in Shapes")
+    plt.xlabel("Shapes")
+    plt.ylabel("Vertices")
+    plt.show()
+
     # Faces
 
     smallest_face_count = df.nsmallest(3, ['Number of Faces'], keep='first')[['Class', 'File Name', 'Number of Vertices', 'Number of Faces']]
@@ -90,42 +97,70 @@ def analyze(input_csv: str) -> None:
 
     print("~~\n")
 
+    plt.hist(df['Number of Faces'], bins=500)
+    plt.title("Faces in Shapes")
+    plt.xlabel("Shapes")
+    plt.ylabel("Facess")
+    plt.show()
+
+    # Barycenter TODO
+
+    #print("Barycenter Calculations:\n")
+
     # Bounding Boxes
 
     print("Bounding Box Calculations:\n")
 
     print("Corner Xmin")
-    avg_Xmin = df["Bounding Box Xmin"].astype(float).mean()
+    smallest_Xmin = df["Bounding Box Xmin"].min()
+    largest_Xmin = df["Bounding Box Xmin"].max()
+    print(f"Range of Xmin: {smallest_Xmin} ~ {largest_Xmin}")
+    avg_Xmin = df["Bounding Box Xmin"].mean()
     print(f"Average Xmin: {avg_Xmin}")
     max_Xmin_error = max(df["Bounding Box Xmin"].astype(float).max() - avg_Xmin, df["Bounding Box Xmin"].astype(float).min() - avg_Xmin)
     print(f"Max error from average Xmin: {max_Xmin_error}\n")
 
     print("Corner Xmax")
-    avg_Xmax = df["Bounding Box Xmax"].astype(float).mean()
+    smallest_Xmax = df["Bounding Box Xmax"].min()
+    largest_Xmax = df["Bounding Box Xmax"].max()
+    print(f"Range of Xmax: {smallest_Xmax} ~ {largest_Xmax}")
+    avg_Xmax = df["Bounding Box Xmax"].mean()
     print(f"Average Xmax: {avg_Xmax}")
     max_Xmax_error = max(df["Bounding Box Xmax"].astype(float).max() - avg_Xmax, df["Bounding Box Xmax"].astype(float).min() - avg_Xmax)
     print(f"Max error from average Xmax: {max_Xmax_error}\n")
 
     print("Corner Ymin")
-    avg_Ymin = df["Bounding Box Ymin"].astype(float).mean()
+    smallest_Ymin = df["Bounding Box Ymin"].min()
+    largest_Ymin = df["Bounding Box Ymin"].max()
+    print(f"Range of Ymin: {smallest_Ymin} ~ {largest_Ymin}")
+    avg_Ymin = df["Bounding Box Ymin"].mean()
     print(f"Average Ymin: {avg_Ymin}")
     max_Ymin_error = max(df["Bounding Box Ymin"].astype(float).max() - avg_Ymin, df["Bounding Box Ymin"].astype(float).min() - avg_Ymin)
     print(f"Max error from average Ymin: {max_Ymin_error}\n")
 
     print("Corner Ymax")
-    avg_Ymax = df["Bounding Box Ymax"].astype(float).mean()
+    smallest_Ymax = df["Bounding Box Ymax"].min()
+    largest_Ymax = df["Bounding Box Ymax"].max()
+    print(f"Range of Ymax: {smallest_Ymax} ~ {largest_Ymax}")
+    avg_Ymax = df["Bounding Box Ymax"].mean()
     print(f"Average Ymax: {avg_Ymax}")
     max_Ymax_error = max(df["Bounding Box Ymax"].astype(float).max() - avg_Ymax, df["Bounding Box Ymax"].astype(float).min() - avg_Ymax)
     print(f"Max error from average Ymax: {max_Ymax_error}\n")
 
     print("Corner Zmin")
-    avg_Zmin = df["Bounding Box Zmin"].astype(float).mean()
+    smallest_Zmin = df["Bounding Box Zmin"].min()
+    largest_Zmin = df["Bounding Box Zmin"].max()
+    print(f"Range of Zmin: {smallest_Zmin} ~ {largest_Zmin}")
+    avg_Zmin = df["Bounding Box Zmin"].mean()
     print(f"Average Zmin: {avg_Zmin}")
     max_Zmin_error = max(df["Bounding Box Zmin"].astype(float).max() - avg_Zmin, df["Bounding Box Zmin"].astype(float).min() - avg_Zmin)
     print(f"Max error from average Zmin: {max_Zmin_error}\n")
 
     print("Corner Zmax")
-    avg_Zmax = df["Bounding Box Zmax"].astype(float).mean()
+    smallest_Zmax = df["Bounding Box Zmax"].min()
+    largest_Zmax = df["Bounding Box Zmax"].max()
+    print(f"Range of Zmax: {smallest_Zmax} ~ {largest_Zmax}")
+    avg_Zmax = df["Bounding Box Zmax"].mean()
     print(f"Average Zmax: {avg_Zmax}")
     max_Zmax_error = max(df["Bounding Box Zmax"].astype(float).max() - avg_Zmax, df["Bounding Box Zmax"].astype(float).min() - avg_Zmax)
     print(f"Max error from average Zmax: {max_Zmax_error}\n")
