@@ -9,15 +9,25 @@ TARGET_RANGE: int = 500
 def decimate(shape: Mesh) -> Mesh:
     vertex_count = len(shape.vertices)
     while vertex_count > TARGET + TARGET_RANGE:
-        shape = shape.decimate(fraction = 0.8, regularization=0.05)
-        vertex_count = len(shape.vertices)
+        shape = shape.decimate_binned(use_clustering=True)
+        new_vertex_count = len(shape.vertices)
+        print(f"Decimated to {new_vertex_count} vertices")
+        if new_vertex_count == vertex_count:
+            break
+        vertex_count = new_vertex_count
     return shape
 
 def subdivide(shape: Mesh, passes: int = 1) -> Mesh:
     for _ in range(passes):
         vertex_count = len(shape.vertices)
-        n = int(np.ceil(np.log(4 * TARGET / vertex_count) / np.log(4)))
-        shape = shape.subdivide(n = n, method = 2)
+        while vertex_count < 4 * TARGET:
+            print(f"Current vertex count: {vertex_count}")
+            shape = shape.subdivide(n = 1, method = 2)
+            new_vertex_count = len(shape.vertices)
+            print(f"Subdivided to {new_vertex_count} vertices")
+            if new_vertex_count == vertex_count:
+                break
+            vertex_count = new_vertex_count
         shape = decimate(shape)
     return shape
 
@@ -27,13 +37,17 @@ def main(path: str, passes: int) -> None:
             if file.endswith('.obj'):
                 full_path = os.path.join(root, file)
                 model = load(full_path)
+                print(f"Loaded {full_path}")
 
                 vertex_count = len(model.vertices)
                 if vertex_count > TARGET + TARGET_RANGE:
+                    print("Decimating")
                     refined_model = decimate(model)
                 elif vertex_count < TARGET - TARGET_RANGE:
+                    print("Subdividing")
                     refined_model = subdivide(model, passes)
                 else:
+                    print("Skipping")
                     refined_model = model
                 write(refined_model, full_path)
                 print(f"Refined {full_path}")
