@@ -1,138 +1,53 @@
 """
 modified from trimesh.remesh, only subdivide the longest edge
 """
-import numpy as np
 import trimesh
+import vedo
+import vedo.mesh
 
-def subdivide2(vertices,
-              faces,
-              face_index=None):
-    """
-    Subdivide a mesh into smaller triangles.
-
-    Note that if `face_index` is passed, only those
-    faces will be subdivided and their neighbors won't
-    be modified making the mesh no longer "watertight."
-
-    Parameters
-    ------------
-    vertices : (n, 3) float
-      Vertices in space
-    faces : (m, 3) int
-      Indexes of vertices which make up triangular faces
-    face_index : faces to subdivide.
-      if None: all faces of mesh will be subdivided
-      if (n,) int array of indices: only specified faces
-
-    Returns
-    ----------
-    new_vertices : (q, 3) float
-      Vertices in space
-    new_faces : (p, 3) int
-      Remeshed faces
-    """
-    if face_index is None:
-        face_index = np.arange(len(faces))
-    else:
-        face_index = np.asanyarray(face_index)
-
-    # the (c, 3) int array of vertex indices
-    faces_subset = faces[face_index]  # (F,3)
-
-    # find max edge of each face
-    face_edges = faces_subset[:, [0, 1, 1, 2, 2, 0]].reshape((-1, 3, 2))  # (F,3,2)
-    face_edges_length = ((np.diff(vertices[face_edges], axis=2) ** 2).sum(axis=3) ** 0.5).reshape((-1, 3))  # (F,3)
-    face_edges_argmax = np.argmax(face_edges_length, axis=1)  # (F,)
-    face_max_edge = face_edges[np.arange(len(face_edges_argmax)), face_edges_argmax]  # (F,2)
-
-    # subdivide max_edge
-    mid = vertices[face_max_edge].mean(axis=1)
-    mid_idx = np.arange(len(mid)) + len(vertices)
-
-    # find another vertex of triangle out of max edge
-    vertex_in_edge = np.full_like(faces_subset, fill_value=False)
-    for i in range(faces_subset.shape[1]):
-        for j in range(face_max_edge.shape[1]):
-            vertex_in_edge[:, i] = np.logical_or(vertex_in_edge[:, i], faces_subset[:, i] == face_max_edge[:, j])
-    another_vertices = faces_subset[np.logical_not(vertex_in_edge)]
-
-    # the new faces_subset with correct winding
-    f = np.column_stack([another_vertices,
-                         face_max_edge[:, 0],
-                         mid_idx,
-
-                         mid_idx,
-                         face_max_edge[:, 1],
-                         another_vertices,
-                         ]).reshape((-1, 3))
-    # add new faces_subset per old face
-    new_faces = np.vstack((faces, f[len(face_index):]))
-    # replace the old face with a smaller face
-    new_faces[face_index] = f[:len(face_index)]
-
-    new_vertices = np.vstack((vertices, mid))
-
-    return new_vertices, new_faces
-
-def decimate(mesh: trimesh.Trimesh, target: int) -> trimesh.Trimesh:
+def decimate(file_path: str, target: int) -> None:
+    mesh: vedo.Mesh = vedo.load(file_path)
     loops = 0.0
     last_vert = len(mesh.vertices)
     while len(mesh.vertices) > target:
-        print(f"trying to decimate... at {len(mesh.vertices)} vertices with aggression {1 + loops * 0.2}")
-        mesh = mesh.simplify_quadric_decimation(percent = 0.2 + loops * 0.005, aggression = 0.01)
+        mesh = mesh.decimate(fraction = 0.9, regularization=0.05)
         loops = loops + 1.0
         if last_vert - len(mesh.vertices) < 10 * loops:
             break
         last_vert = len(mesh.vertices)
-    return mesh
+    vedo.write(mesh, file_path)
 
-def subdivide(shape: trimesh.Trimesh, target: int) -> trimesh.Trimesh:
-    while len(shape.vertices) < target:
-        (new_verts, new_faces) = subdivide2(shape.vertices, shape.faces)
-        shape.vertices = new_verts
-        shape.faces = new_faces
-    return shape
+def subdivide(file_path: str, target: int) -> None:
+    mesh: trimesh.Trimesh = trimesh.load(file_path)
+    while len(mesh.vertices) < target:
+        mesh = mesh.subdivide()
+    mesh.export(file_path)
 
-def distribute_faces(mesh: trimesh.Trimesh, passes: int, lower_target: int, upper_target: int) -> trimesh.Trimesh:
+def distribute_faces(file_path: str, passes: int, lower_target: int, upper_target: int) -> None:
     for _ in range(passes):
-        mesh = subdivide(mesh, lower_target * 4)
-        mesh = decimate(mesh, upper_target)
-    return mesh
+        subdivide(file_path, lower_target * 4)
+        decimate(file_path, upper_target)
 
 def refine_mesh(file_path: str, passes: int, lower_target: int, upper_target: int) -> None:
     mesh = trimesh.load(file_path)
-
-    """
     vertex_count = len(mesh.vertices)
-    if vertex_count < lower_target:
-        refined_mesh = subdivide(mesh, lower_target)
-    elif vertex_count > upper_target:
-        refined_mesh = decimate(mesh, upper_target)
-    else:
-        refined_mesh = mesh
-    """
-
-    vertex_count = len(mesh.vertices)
-    print(f"Starting with {vertex_count} vertices")
-    refined_mesh = mesh
     loops = 0
     total_loops = 0
     extra_ranges = 0
     extra_range_length = (upper_target - lower_target)/4
     while vertex_count < lower_target - (extra_range_length*extra_ranges) or vertex_count > upper_target + (extra_range_length*extra_ranges):
         if vertex_count < lower_target - (extra_range_length*extra_ranges):
-            refined_mesh = subdivide(refined_mesh, lower_target - (extra_range_length*extra_ranges))
+            subdivide(file_path, lower_target - (extra_range_length*extra_ranges))
         if vertex_count > upper_target + (extra_range_length*extra_ranges):
-            refined_mesh = decimate(refined_mesh, upper_target + (extra_range_length*extra_ranges))
+            decimate(file_path, upper_target + (extra_range_length*extra_ranges))
 
-        vertex_count = len(refined_mesh.vertices)
+        mesh = trimesh.load(file_path)
+        vertex_count = len(mesh.vertices)
         loops = loops + 1
         total_loops = total_loops + 1
-        print(f"loop {total_loops}: at {vertex_count} vertices")
         if loops >= 5:
             extra_ranges = extra_ranges + 1
             loops = 0
 
-    #refined_mesh = distribute_faces(refined_mesh, passes, lower_target, upper_target)
-    refined_mesh.export(file_path)
+    distribute_faces(file_path, passes, lower_target, upper_target)
     print(f"Refined mesh saved to {file_path} in {loops} loops")
