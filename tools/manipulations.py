@@ -75,8 +75,15 @@ def subdivide2(vertices,
     return new_vertices, new_faces
 
 def decimate(mesh: trimesh.Trimesh, target: int) -> trimesh.Trimesh:
+    loops = 0.0
+    last_vert = len(mesh.vertices)
     while len(mesh.vertices) > target:
-        mesh = mesh.simplify_quadric_decimation(percent=0.1, aggression=0)
+        print(f"trying to decimate... at {len(mesh.vertices)} vertices with aggression {1 + loops * 0.2}")
+        mesh = mesh.simplify_quadric_decimation(percent = 0.2 + loops * 0.005, aggression = 0.01)
+        loops = loops + 1.0
+        if last_vert - len(mesh.vertices) < 10 * loops:
+            break
+        last_vert = len(mesh.vertices)
     return mesh
 
 def subdivide(shape: trimesh.Trimesh, target: int) -> trimesh.Trimesh:
@@ -95,6 +102,7 @@ def distribute_faces(mesh: trimesh.Trimesh, passes: int, lower_target: int, uppe
 def refine_mesh(file_path: str, passes: int, lower_target: int, upper_target: int) -> None:
     mesh = trimesh.load(file_path)
 
+    """
     vertex_count = len(mesh.vertices)
     if vertex_count < lower_target:
         refined_mesh = subdivide(mesh, lower_target)
@@ -102,6 +110,29 @@ def refine_mesh(file_path: str, passes: int, lower_target: int, upper_target: in
         refined_mesh = decimate(mesh, upper_target)
     else:
         refined_mesh = mesh
-    refined_mesh = distribute_faces(refined_mesh, passes, lower_target, upper_target)
+    """
+
+    vertex_count = len(mesh.vertices)
+    print(f"Starting with {vertex_count} vertices")
+    refined_mesh = mesh
+    loops = 0
+    total_loops = 0
+    extra_ranges = 0
+    extra_range_length = (upper_target - lower_target)/4
+    while vertex_count < lower_target - (extra_range_length*extra_ranges) or vertex_count > upper_target + (extra_range_length*extra_ranges):
+        if vertex_count < lower_target - (extra_range_length*extra_ranges):
+            refined_mesh = subdivide(refined_mesh, lower_target - (extra_range_length*extra_ranges))
+        if vertex_count > upper_target + (extra_range_length*extra_ranges):
+            refined_mesh = decimate(refined_mesh, upper_target + (extra_range_length*extra_ranges))
+
+        vertex_count = len(refined_mesh.vertices)
+        loops = loops + 1
+        total_loops = total_loops + 1
+        print(f"loop {total_loops}: at {vertex_count} vertices")
+        if loops >= 5:
+            extra_ranges = extra_ranges + 1
+            loops = 0
+
+    #refined_mesh = distribute_faces(refined_mesh, passes, lower_target, upper_target)
     refined_mesh.export(file_path)
-    print(f"Refined mesh saved to {file_path}")
+    print(f"Refined mesh saved to {file_path} in {loops} loops")

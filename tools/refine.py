@@ -4,7 +4,7 @@ import multiprocessing as mp
 from manipulations import refine_mesh
 
 TARGET: int = 5000
-TARGET_RANGE: int = 500
+TARGET_RANGE: int = 1000
 DISTRIBUTION_SUBDIVISIONS: int = 3
 
 def main(path: str, passes: int) -> None:
@@ -34,3 +34,4 @@ if __name__ == "__main__":
         main(sys.argv[2], int(sys.argv[1]))
     else:
         print("Please provide the number of passes and the path to the database")
+
