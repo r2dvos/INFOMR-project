@@ -11,6 +11,7 @@ def compute_barycenter(shape: Mesh):
     vertices = shape.vertices
     cell_centers = shape.cell_centers
     count = 0
+    count_total = 0
     point_total = [0, 0, 0]
     for face in faces:
         point_array = []
@@ -26,7 +27,8 @@ def compute_barycenter(shape: Mesh):
         point_total[1] = point_total[1] + cell_centers[count][1] * area
         point_total[2] = point_total[2] + cell_centers[count][2] * area
         count = count + 1
-    barycenter = [point_total[0]/count, point_total[1]/count, point_total[2]/count]
+        count_total = count_total + area
+    barycenter = [point_total[0]/count_total, point_total[1]/count_total, point_total[2]/count_total]
     return barycenter
 
 
