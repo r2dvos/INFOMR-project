@@ -6,7 +6,7 @@ import numpy as np
 
 def normalize_shape(shape: Mesh) -> Mesh:
     # Position normalization
-    barycenter = shape.center_of_mass()
+    barycenter = compute_barycenter(shape)
     shape.vertices = (shape.vertices - barycenter)
 
     # Rotation normalization
@@ -35,6 +35,9 @@ def normalize_shape(shape: Mesh) -> Mesh:
     max_bound = max([abs(bounds[1] - bounds[0]), abs(bounds[3] - bounds[2]), abs(bounds[5] - bounds[4])])
     shape.scale(1 / max_bound)
     return shape
+
+def compute_barycenter(shape: Mesh):
+    undefined
 
 def main(path: str) -> None:
     for root, _, files in os.walk(path):
