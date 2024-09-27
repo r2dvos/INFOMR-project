@@ -9,6 +9,12 @@ import trimesh
 import vedo
 import vedo.mesh
 
+def decimate_trimesh(file_path: str, target: int) -> None:
+    mesh: trimesh.Trimesh = trimesh.load(file_path)
+    while len(mesh.vertices) > target:
+        mesh = mesh.simplify_quadric_decimation(percent = 0.2, aggression=4)
+    mesh.export(file_path)
+
 def decimate(file_path: str, target: int) -> None:
     mesh: vedo.Mesh = vedo.load(file_path)
     loops = 0.0
@@ -56,3 +62,10 @@ def refine_mesh(file_path: str, passes: int, lower_target: int, upper_target: in
     distribute_faces(file_path, passes, lower_target, upper_target)
     print(f"Refined mesh saved to {file_path} in {loops} loops")
 
+def final_decimate(file_path: str, passes: int, lower_target: int, upper_target: int) -> None:
+    mesh = trimesh.load(file_path)
+    if len(mesh.vertices) > upper_target:
+        decimate_trimesh(file_path, upper_target)
+        print(f"Final decimation saved to {file_path}")
+    else:
+        print(f"Mesh already within target range. Skipping final decimation for {file_path}")
