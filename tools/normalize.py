@@ -37,9 +37,6 @@ def normalize_shape(shape: Mesh) -> Mesh:
     shape.scale(1 / max_bound)
     return shape
 
-def compute_barycenter(shape: Mesh):
-    undefined
-
 def main(path: str) -> None:
     for root, _, files in os.walk(path):
         for file in files:
@@ -47,6 +44,7 @@ def main(path: str) -> None:
                 full_path = os.path.join(root, file)
                 shape = load(full_path)
                 normalized_shape = normalize_shape(shape)
+                print("Normalized shape " + full_path)
                 write(normalized_shape, full_path)
 
 if __name__ == "__main__":

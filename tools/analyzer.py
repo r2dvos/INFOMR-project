@@ -1,6 +1,12 @@
+import pip
+import numpy as np
+if np.__version__==2.1:
+    pass
+else:
+    pip.main(['install', 'numpy==2.1'])
+
 import os
 import sys
-import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from vedo import load
@@ -102,10 +108,6 @@ def analyze(input_csv: str) -> None:
     plt.xlabel("Shapes")
     plt.ylabel("Facess")
     plt.show()
-
-    # Barycenter TODO
-
-    #print("Barycenter Calculations:\n")
 
     # Bounding Boxes
 
