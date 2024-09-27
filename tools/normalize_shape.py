@@ -3,6 +3,8 @@ import os
 from vedo import load, write
 from vedo import Mesh
 import numpy as np
+import tkinter as tk
+from tkinter import filedialog
 from find_barycenter import compute_barycenter
 
 def normalize_shape(shape: Mesh) -> Mesh:
@@ -35,20 +37,16 @@ def normalize_shape(shape: Mesh) -> Mesh:
     bounds = shape.bounds()
     max_bound = max([abs(bounds[1] - bounds[0]), abs(bounds[3] - bounds[2]), abs(bounds[5] - bounds[4])])
     shape.scale(1 / max_bound)
-    return shape
 
-def main(path: str) -> None:
-    for root, _, files in os.walk(path):
-        for file in files:
-            if file.endswith('.obj'):
-                full_path = os.path.join(root, file)
-                shape = load(full_path)
-                normalized_shape = normalize_shape(shape)
-                print("Normalized shape " + full_path)
-                write(normalized_shape, full_path)
+    return shape
+                
 
 if __name__ == "__main__":
-    if len(sys.argv) > 1:
-        main(sys.argv[1])
-    else:
-        print("Please provide a path to the database")
+    root = tk.Tk()
+    root.withdraw()
+
+    objFile = filedialog.askopenfilename(initialdir = "../../ShapeDatabase_INFOMR_copy")
+    shape = load(objFile)
+
+    normalized_shape = normalize_shape(shape)
+    write(normalized_shape, objFile)

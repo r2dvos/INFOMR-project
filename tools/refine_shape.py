@@ -1,3 +1,10 @@
+import pip
+import numpy as np
+if np.__version__==1.26:
+    pass
+else:
+    pip.main(['install', 'numpy==1.26'])
+
 import sys
 import os
 import tkinter as tk

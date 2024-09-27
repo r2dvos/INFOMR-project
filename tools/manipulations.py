@@ -1,6 +1,10 @@
-"""
-modified from trimesh.remesh, only subdivide the longest edge
-"""
+import pip
+import numpy as np
+if np.__version__==1.26:
+    pass
+else:
+    pip.main(['install', 'numpy==1.26'])
+
 import trimesh
 import vedo
 import vedo.mesh
