@@ -73,6 +73,9 @@ def final_decimate_fallback(file_path: str, passes: int, lower_target: int, uppe
     mesh = vedo.load(file_path)
     if len(mesh.vertices) > upper_target:
         decimate_binned(file_path, upper_target)
-        print(f"Final decimation saved to {file_path}")
+        mesh = vedo.load(file_path)
+        if len(mesh.vertices) < lower_target:
+            distribute_faces(file_path, passes, lower_target, upper_target)
+        print(f"Final decimation fallback saved to {file_path}")
     else:
-        print(f"Mesh already within target range. Skipping final decimation for {file_path}")
+        print(f"Mesh already within target range. Skipping final decimation fallback for {file_path}")

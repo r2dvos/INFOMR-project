@@ -10,7 +10,7 @@ DISTRIBUTION_SUBDIVISIONS: int = 3
 BATCH_SIZE: int = 10
 
 def refine_pass(function, path: str, passes: int, lower: int, upper: int) -> None:
-    max_duration = 120
+    max_duration = 60
     errors = []
     tasks = []
     for root, _, files in os.walk(path):
