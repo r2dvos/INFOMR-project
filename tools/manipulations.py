@@ -1,10 +1,3 @@
-import pip
-import numpy as np
-if np.__version__==1.26:
-    pass
-else:
-    pip.main(['install', 'numpy==1.26'])
-
 import trimesh
 import vedo
 import vedo.mesh
@@ -15,12 +8,18 @@ def decimate_trimesh(file_path: str, target: int) -> None:
         mesh = mesh.simplify_quadric_decimation(percent = 0.2, aggression=4)
     mesh.export(file_path)
 
+def decimate_binned(file_path: str, target: int) -> None:
+    mesh: vedo.Mesh = vedo.load(file_path)
+    while len(mesh.vertices) > target:
+        mesh = mesh.decimate_binned(use_clustering=True)
+    vedo.write(mesh, file_path)
+
 def decimate(file_path: str, target: int) -> None:
     mesh: vedo.Mesh = vedo.load(file_path)
     loops = 0.0
     last_vert = len(mesh.vertices)
     while len(mesh.vertices) > target:
-        mesh = mesh.decimate(fraction = 0.9, regularization=0.05)
+        mesh = mesh.decimate(fraction = 0.9, preserve_volume=False, regularization=0.05)
         loops = loops + 1.0
         if last_vert - len(mesh.vertices) < 10 * loops:
             break
@@ -66,6 +65,14 @@ def final_decimate(file_path: str, passes: int, lower_target: int, upper_target:
     mesh = trimesh.load(file_path)
     if len(mesh.vertices) > upper_target:
         decimate_trimesh(file_path, upper_target)
+        print(f"Final decimation saved to {file_path}")
+    else:
+        print(f"Mesh already within target range. Skipping final decimation for {file_path}")
+
+def final_decimate_fallback(file_path: str, passes: int, lower_target: int, upper_target: int) -> None:
+    mesh = vedo.load(file_path)
+    if len(mesh.vertices) > upper_target:
+        decimate_binned(file_path, upper_target)
         print(f"Final decimation saved to {file_path}")
     else:
         print(f"Mesh already within target range. Skipping final decimation for {file_path}")
