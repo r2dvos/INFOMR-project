@@ -37,13 +37,22 @@ def check_rotation(shape: Mesh):
     eigenvalues, eigenvectors = np.linalg.eigh(cov_matrix)
     sorted_indices = np.argsort(eigenvalues)[::-1]
     largest_eigenvector = eigenvectors[:, sorted_indices[0]]
-    return (abs(largest_eigenvector[0] - 1)) + abs(largest_eigenvector[1]) + abs(largest_eigenvector[2])
+    return (largest_eigenvector[0] - 1) + largest_eigenvector[1] + largest_eigenvector[2]
 
 #~~
 
 def get_flip(shape: Mesh):
-    points = shape.vertices ##
-    moments = np.sum(points**2, axis=0)
+    points = shape.vertices
+
+    moment_x = 0
+    moment_y = 0
+    moment_z = 0
+    for i in range(len(points)):
+        moment_x = moment_x + np.sign(points[i][0]) * (points[i][0]**2)
+        moment_y = moment_y + np.sign(points[i][1]) * (points[i][1]**2)
+        moment_z = moment_z + np.sign(points[i][2]) * (points[i][2]**2)
+
+    moments = [moment_x, moment_y, moment_z]
     for i in range(3):
         if moments[i] < 0:
             moments[i] = -1
@@ -52,8 +61,17 @@ def get_flip(shape: Mesh):
     return moments
 
 def check_flip(shape: Mesh):
-    points = shape.vertices ##
-    moments = np.sum(points**2, axis=0)
+    points = shape.vertices
+
+    moment_x = 0
+    moment_y = 0
+    moment_z = 0
+    for i in range(len(points)):
+        moment_x = moment_x + np.sign(points[i][0]) * (points[i][0]**2)
+        moment_y = moment_y + np.sign(points[i][1]) * (points[i][1]**2)
+        moment_z = moment_z + np.sign(points[i][2]) * (points[i][2]**2)
+
+    moments = [moment_x, moment_y, moment_z]
     for i in range(3):
         if moments[i] < 0:
             moments[i] = -1

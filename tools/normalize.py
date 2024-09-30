@@ -25,17 +25,25 @@ def normalize_shape(shape: Mesh) -> Mesh:
     shape.vertices = rotated_points
 
     # Flip
-    moments = np.sum(rotated_points**2, axis=0)
-    for i in range(3):
-        if moments[i] < 0:
-            rotated_points[:, i] = -rotated_points[:, i]
-    shape.vertices = rotated_points
+    moment_x = 0
+    moment_y = 0
+    moment_z = 0
+    for i in range(len(rotated_points)):
+        moment_x = moment_x + np.sign(rotated_points[i][0]) * (rotated_points[i][0]**2)
+        moment_y = moment_y + np.sign(rotated_points[i][1]) * (rotated_points[i][1]**2)
+        moment_z = moment_z + np.sign(rotated_points[i][2]) * (rotated_points[i][2]**2)
+
+    flip_table = [[np.sign(moment_x), 0, 0], [0, np.sign(moment_y), 0], [0, 0, np.sign(moment_z)]]
+    fliped_points = np.dot(rotated_points,flip_table)
+    shape.vertices = fliped_points
 
     # Scale normalization
     bounds = shape.bounds()
     max_bound = max([abs(bounds[1] - bounds[0]), abs(bounds[3] - bounds[2]), abs(bounds[5] - bounds[4])])
     shape.scale(1 / max_bound)
+
     return shape
+
 
 def main(path: str) -> None:
     for root, _, files in os.walk(path):
