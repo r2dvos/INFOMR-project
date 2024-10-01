@@ -10,6 +10,8 @@ import sys
 import pandas as pd
 import matplotlib.pyplot as plt
 from vedo import load
+import tkinter as tk
+from tkinter import filedialog
 
 def get_shape_class(file_path: str) -> str:
     return os.path.basename(os.path.dirname(file_path))
@@ -170,9 +172,26 @@ def analyze(input_csv: str) -> None:
     # ~~
 
 if __name__ == "__main__":
-    if len(sys.argv) == 2:
-        analyze(sys.argv[1])
-    elif len(sys.argv) > 2:
-        main(sys.argv[1], sys.argv[2])
+    help = "-c: Analyze an out csv. Arg: csv path\n-f: Analyze a single file\n-a: Analyze all files in a directory. Arg: dir path, out csv path\n-h: Display this help message"
+    if len(sys.argv) > 1:
+        mode = sys.argv[1]
     else:
-        print("Please provide: \n 1 - a csv file to read data from or \n 2 - a path to the database and an output CSV file name")
+        print(help)
+        sys.exit()
+
+    if mode == "-c" and len(sys.argv) > 2:
+        analyze(sys.argv[2])
+    if mode == "-f":
+        root = tk.Tk()
+        root.withdraw()
+
+        objFile = filedialog.askopenfilename(initialdir = "../ShapeDatabase_INFOMR")
+
+        shape = load(objFile)
+        (num_vertices, num_faces, face_type, bounding_box) = analyze_shape(objFile)
+
+        print("Shape Analyzed: Vertices - ", num_vertices, ", Faces - ", num_faces, ", Face Types - ", face_type, ", Bounding Box - ", bounding_box)
+    elif mode == "-a" and len(sys.argv) > 3:
+        main(sys.argv[2], sys.argv[3])
+    else:
+        print(help)
