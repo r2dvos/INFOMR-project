@@ -9,6 +9,8 @@ import matplotlib.pyplot as plt
 from vedo import Mesh, load
 import numpy as np
 
+from find_barycenter import compute_barycenter
+
 # Two kinds of functions: gets & checks
 # - gets: returns value of function for plotting
 # - checks: returns error of function
@@ -16,11 +18,11 @@ import numpy as np
 #~~
 
 def get_translation(shape: Mesh):
-    barycenter = shape.center_of_mass()
+    barycenter = compute_barycenter(shape)
     return barycenter
 
 def check_translation(shape: Mesh):
-    barycenter = shape.center_of_mass()
+    barycenter = compute_barycenter(shape)
     return abs(barycenter[0] ** 3) + abs(barycenter[1] ** 3) + abs(barycenter[2] ** 3)
 
 #~~
