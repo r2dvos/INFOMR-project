@@ -6,10 +6,7 @@ import numpy as np
 import tkinter as tk
 from tkinter import filedialog
 
-def compute_barycenter(shape: Mesh):
-    faces = shape.cells
-    vertices = shape.vertices
-    cell_centers = shape.cell_centers
+def compute_barycenter(faces: np.ndarray, vertices: np.ndarray, cell_centers: np.ndarray):
     count = 0
     count_total = 0
     point_total = [0, 0, 0]
@@ -31,18 +28,17 @@ def compute_barycenter(shape: Mesh):
     barycenter = [point_total[0]/count_total, point_total[1]/count_total, point_total[2]/count_total]
     return barycenter
 
-def compute_eigenvectors(shape: Mesh) -> tuple[np.ndarray, np.ndarray]:
-    points = shape.vertices
+def compute_eigenvectors(points: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
     cov_matrix = np.cov(points, rowvar=False)
     eigenvalues, eigenvectors = np.linalg.eigh(cov_matrix)
     sorted_indices = np.argsort(eigenvalues)[::-1]
     largest_eigenvector = eigenvectors[:, sorted_indices[0]]
     second_largest_eigenvector = eigenvectors[:, sorted_indices[1]]
-    return (largest_eigenvector, second_largest_eigenvector)
+    largest_eigenvalue = eigenvalues[sorted_indices[0]]
+    second_largest_eigenvalue = eigenvalues[sorted_indices[1]]
+    return (largest_eigenvector, second_largest_eigenvector, largest_eigenvalue, second_largest_eigenvalue)
 
-def compute_flip(shape: Mesh) -> list[int]:
-    points = shape.vertices
-
+def compute_flip(points: np.ndarray) -> list[int]:
     moment_x = 0
     moment_y = 0
     moment_z = 0
@@ -59,19 +55,18 @@ def compute_flip(shape: Mesh) -> list[int]:
             moments[i] = 1
     return moments
 
-def compute_scaling(shape: Mesh) -> float:
-    bounds = shape.bounds()
+def compute_scaling(bounds: np.ndarray) -> float:
     max_bound = max([abs(bounds[1] - bounds[0]), abs(bounds[3] - bounds[2]), abs(bounds[5] - bounds[4])])
     return max_bound
 
 def normalize_shape(shape: Mesh) -> Mesh:
     # Position normalization
-    barycenter = compute_barycenter(shape)
+    barycenter = compute_barycenter(shape.cells, shape.vertices, shape.cell_centers)
     shape.vertices = (shape.vertices - barycenter)
 
     # Rotation normalization
     points = shape.vertices
-    (largest_eigenvector, second_largest_eigenvector) = compute_eigenvectors(shape)
+    (largest_eigenvector, second_largest_eigenvector, _, _) = compute_eigenvectors(shape.vertices)
     rotation_matrix = np.eye(3)
     rotation_matrix[:, 0] = largest_eigenvector
     rotation_matrix[:, 1] = second_largest_eigenvector
@@ -80,19 +75,19 @@ def normalize_shape(shape: Mesh) -> Mesh:
     shape.vertices = rotated_points
 
     # Flip
-    (moment_x, moment_y, moment_z) = compute_flip(shape)
+    (moment_x, moment_y, moment_z) = compute_flip(shape.vertices)
     flip_table = [[np.sign(moment_x), 0, 0], [0, np.sign(moment_y), 0], [0, 0, np.sign(moment_z)]]
     fliped_points = np.dot(rotated_points,flip_table)
     shape.vertices = fliped_points
 
     # Scale normalization
-    max_bound = compute_scaling(shape)
+    max_bound = compute_scaling(shape.bounds())
     shape.scale(1 / max_bound)
 
     return shape
 
 if __name__ == "__main__":
-    help = "-f: Normalize a single file\n-a: Normalize all files in a directory. Arg: dir path\n-b: Compute barycenter of a single file\n-h: Display this help message"
+    help = "Usage:\n-f: Normalize a single file\n-a: Normalize all files in a directory. Arg: dir path\n-b: Compute barycenter of a single file\n-h: Display this help message"
     if len(sys.argv) > 1:
         mode = sys.argv[1]
     else:

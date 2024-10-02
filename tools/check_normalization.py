@@ -11,19 +11,19 @@ from normalization import compute_barycenter, compute_eigenvectors, compute_flip
 
 
 def check_translation(shape: Mesh):
-    barycenter = compute_barycenter(shape)
+    barycenter = compute_barycenter(shape.cells, shape.vertices, shape.cell_centers)
     return abs(barycenter[0] ** 3) + abs(barycenter[1] ** 3) + abs(barycenter[2] ** 3)
 
 def check_rotation(shape: Mesh):
-    (largest_eigenvector, _) = compute_eigenvectors(shape)
+    (largest_eigenvector, _, _, _) = compute_eigenvectors(shape.vertices)
     return (largest_eigenvector[0] - 1) + largest_eigenvector[1] + largest_eigenvector[2]
 
 def check_flip(shape: Mesh):
-    moments = compute_flip(shape)
+    moments = compute_flip(shape.vertices)
     return (-(moments[0] - 1) / 2) + (-(moments[1] - 1) / 2) + (-(moments[2] - 1) / 2)
 
 def check_scaling(shape: Mesh):
-    max_bound = compute_scaling(shape)
+    max_bound = compute_scaling(shape.bounds())
     return max_bound - 1
 
 #
@@ -42,15 +42,15 @@ def write_normals(path: str, output_csv: str) -> None:
                 full_path = os.path.join(root, file)
 
                 shape_class = get_shape_class(full_path)
-                shape = load(full_path)
+                shape: Mesh = load(full_path)
 
-                barycenter = compute_barycenter(shape)
+                barycenter = compute_barycenter(shape.cells, shape.vertices, shape.cell_centers)
                 barycenter_err = check_translation(shape)
-                rotation = compute_eigenvectors(shape)
+                (rotation, _, _, _) = compute_eigenvectors(shape.vertices)
                 rotation_err = check_rotation(shape)
-                flip = compute_flip(shape)
+                flip = compute_flip(shape.vertices)
                 flip_err = check_flip(shape)
-                scaling = compute_scaling(shape)
+                scaling = compute_scaling(shape.bounds())
                 scaling_err = check_scaling(shape)
                 
                 results.append([

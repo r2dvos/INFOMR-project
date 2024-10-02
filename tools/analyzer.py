@@ -172,7 +172,7 @@ def analyze(input_csv: str) -> None:
     # ~~
 
 if __name__ == "__main__":
-    help = "-c: Analyze an out csv. Arg: csv path\n-f: Analyze a single file\n-a: Analyze all files in a directory. Arg: dir path, out csv path\n-h: Display this help message"
+    help = "Usage:\n-c: Analyze an out csv. Arg: csv path\n-f: Analyze a single file\n-a: Analyze all files in a directory. Arg: dir path, out csv path\n-h: Display this help message"
     if len(sys.argv) > 1:
         mode = sys.argv[1]
     else:
