@@ -1,10 +1,4 @@
-import pip
 import numpy as np
-if np.__version__==2.1:
-    pass
-else:
-    pip.main(['install', 'numpy==2.1'])
-
 import os
 import sys
 import pandas as pd
@@ -40,11 +34,15 @@ def main(path: str, output_csv: str) -> None:
                 full_path = os.path.join(root, file)
                 shape_class = get_shape_class(full_path)
                 num_vertices, num_faces, face_type, bounding_box = analyze_shape(full_path)
+
+                largest_side = max(bounding_box[1] - bounding_box[0], bounding_box[3] - bounding_box[2], bounding_box[5] - bounding_box[4])
+                volume = (bounding_box[1] - bounding_box[0]) * (bounding_box[3] - bounding_box[2]) * (bounding_box[5] - bounding_box[4])
                 
                 results.append([
                     file, shape_class, num_vertices, num_faces, face_type,
                     bounding_box[0], bounding_box[1], bounding_box[2],
-                    bounding_box[3], bounding_box[4], bounding_box[5]
+                    bounding_box[3], bounding_box[4], bounding_box[5],
+                    largest_side, volume
                 ])
     
     results_array = np.array(results, dtype=object)
@@ -52,7 +50,8 @@ def main(path: str, output_csv: str) -> None:
     columns = [
         "File Name", "Class", "Number of Vertices", "Number of Faces", "Face Type",
         "Bounding Box Xmin", "Bounding Box Xmax", "Bounding Box Ymin",
-        "Bounding Box Ymax", "Bounding Box Zmin", "Bounding Box Zmax"
+        "Bounding Box Ymax", "Bounding Box Zmin", "Bounding Box Zmax",
+        "Largest Bounding Box Side", "Bounding Box Volume"
     ]
     df = pd.DataFrame(results_array, columns=columns)
     df.to_csv(output_csv, index=False)
@@ -112,6 +111,23 @@ def analyze(input_csv: str) -> None:
     # Bounding Boxes
 
     print("Bounding Box Calculations:\n")
+
+    print("Largest Side")
+    largest_sides = df.nlargest(5, ['Largest Bounding Box Side'], keep='first')[['Class', 'File Name', 'Largest Bounding Box Side', 'Bounding Box Volume']]
+    print("Shapes with Largest Bounding Box Side:\n" + str(largest_sides) + "\n")
+
+    print("Volume")
+    largest_volume = df.nlargest(5, ['Bounding Box Volume'], keep='first')[['Class', 'File Name', 'Largest Bounding Box Side', 'Bounding Box Volume']]
+    print("Shapes with Largest Bounding Box Volume:\n" + str(largest_volume) + "\n")
+
+    print("Corner Xmin")
+    smallest_Xmin = df["Bounding Box Xmin"].min()
+    largest_Xmin = df["Bounding Box Xmin"].max()
+    print(f"Range of Xmin: {smallest_Xmin} ~ {largest_Xmin}")
+    avg_Xmin = df["Bounding Box Xmin"].mean()
+    print(f"Average Xmin: {avg_Xmin}")
+    max_Xmin_error = max(df["Bounding Box Xmin"].astype(float).max() - avg_Xmin, df["Bounding Box Xmin"].astype(float).min() - avg_Xmin)
+    print(f"Max error from average Xmin: {max_Xmin_error}\n")
 
     print("Corner Xmin")
     smallest_Xmin = df["Bounding Box Xmin"].min()
