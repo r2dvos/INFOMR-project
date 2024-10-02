@@ -1,4 +1,3 @@
-import pip
 import numpy as np
 
 import os
@@ -8,89 +7,23 @@ import matplotlib.pyplot as plt
 
 from vedo import Mesh, load
 import numpy as np
+from normalization import compute_barycenter, compute_eigenvectors, compute_flip, compute_scaling
 
-from find_barycenter import compute_barycenter
-
-# Two kinds of functions: gets & checks
-# - gets: returns value of function for plotting
-# - checks: returns error of function
-
-#~~
-
-def get_translation(shape: Mesh):
-    barycenter = compute_barycenter(shape)
-    return barycenter
 
 def check_translation(shape: Mesh):
-    barycenter = compute_barycenter(shape)
+    barycenter = compute_barycenter(shape.cells, shape.vertices, shape.cell_centers)
     return abs(barycenter[0] ** 3) + abs(barycenter[1] ** 3) + abs(barycenter[2] ** 3)
 
-#~~
-
-def get_rotation(shape: Mesh):
-    cov_matrix = np.cov(shape.vertices, rowvar=False)
-    eigenvalues, eigenvectors = np.linalg.eigh(cov_matrix)
-    sorted_indices = np.argsort(eigenvalues)[::-1]
-    largest_eigenvector = eigenvectors[:, sorted_indices[0]]
-    return largest_eigenvector
-
 def check_rotation(shape: Mesh):
-    cov_matrix = np.cov(shape.vertices, rowvar=False)
-    eigenvalues, eigenvectors = np.linalg.eigh(cov_matrix)
-    sorted_indices = np.argsort(eigenvalues)[::-1]
-    largest_eigenvector = eigenvectors[:, sorted_indices[0]]
+    (largest_eigenvector, _, _, _) = compute_eigenvectors(shape.vertices)
     return (largest_eigenvector[0] - 1) + largest_eigenvector[1] + largest_eigenvector[2]
 
-#~~
-
-def get_flip(shape: Mesh):
-    points = shape.vertices
-
-    moment_x = 0
-    moment_y = 0
-    moment_z = 0
-    for i in range(len(points)):
-        moment_x = moment_x + np.sign(points[i][0]) * (points[i][0]**2)
-        moment_y = moment_y + np.sign(points[i][1]) * (points[i][1]**2)
-        moment_z = moment_z + np.sign(points[i][2]) * (points[i][2]**2)
-
-    moments = [moment_x, moment_y, moment_z]
-    for i in range(3):
-        if moments[i] < 0:
-            moments[i] = -1
-        else:
-            moments[i] = 1
-    return moments
-
 def check_flip(shape: Mesh):
-    points = shape.vertices
-
-    moment_x = 0
-    moment_y = 0
-    moment_z = 0
-    for i in range(len(points)):
-        moment_x = moment_x + np.sign(points[i][0]) * (points[i][0]**2)
-        moment_y = moment_y + np.sign(points[i][1]) * (points[i][1]**2)
-        moment_z = moment_z + np.sign(points[i][2]) * (points[i][2]**2)
-
-    moments = [moment_x, moment_y, moment_z]
-    for i in range(3):
-        if moments[i] < 0:
-            moments[i] = -1
-        else:
-            moments[i] = 1
+    moments = compute_flip(shape.vertices)
     return (-(moments[0] - 1) / 2) + (-(moments[1] - 1) / 2) + (-(moments[2] - 1) / 2)
 
-#~~
-
-def get_scaling(shape: Mesh):
-    bounds = shape.bounds()
-    max_bound = max([abs(bounds[1] - bounds[0]), abs(bounds[3] - bounds[2]), abs(bounds[5] - bounds[4])])
-    return max_bound
-
 def check_scaling(shape: Mesh):
-    bounds = shape.bounds()
-    max_bound = max([abs(bounds[1] - bounds[0]), abs(bounds[3] - bounds[2]), abs(bounds[5] - bounds[4])])
+    max_bound = compute_scaling(shape.bounds())
     return max_bound - 1
 
 #
@@ -109,15 +42,15 @@ def write_normals(path: str, output_csv: str) -> None:
                 full_path = os.path.join(root, file)
 
                 shape_class = get_shape_class(full_path)
-                shape = load(full_path)
+                shape: Mesh = load(full_path)
 
-                barycenter = get_translation(shape)
+                barycenter = compute_barycenter(shape.cells, shape.vertices, shape.cell_centers)
                 barycenter_err = check_translation(shape)
-                rotation = get_rotation(shape)
+                (rotation, _, _, _) = compute_eigenvectors(shape.vertices)
                 rotation_err = check_rotation(shape)
-                flip = get_flip(shape)
+                flip = compute_flip(shape.vertices)
                 flip_err = check_flip(shape)
-                scaling = get_scaling(shape)
+                scaling = compute_scaling(shape.bounds())
                 scaling_err = check_scaling(shape)
                 
                 results.append([
