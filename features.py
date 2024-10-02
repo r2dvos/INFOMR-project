@@ -1,11 +1,12 @@
 import sys
 import math
 from enum import IntEnum
+import os
 
 import trimesh
-import numpy as np
 import tkinter as tk
 from tkinter import filedialog
+import pandas as pd
 
 from tools.normalization import compute_eigenvectors
 
@@ -57,7 +58,7 @@ def compute_features(mesh: trimesh.Trimesh) -> list[float]:
     return features
 
 if __name__ == "__main__":
-    help = "Usage:\n-f: Normalize a single file\n-h: Display this help message"
+    help = "Usage:\n-f: Print features of a single shape\n-a: Create a csv with the feature of all shapes in a directory. Args: database path, out csv\n-h: Display this help message"
     if len(sys.argv) > 1:
         mode = sys.argv[1]
     else:
@@ -73,5 +74,16 @@ if __name__ == "__main__":
 
         features = compute_features(shape)
         print(features)
+    elif mode == "-a" and len(sys.argv) > 3:
+        columns = ["Surface Area", "Compactness", "3D Regularity", "Diameter", "Convexity", "Eccentricity"]
+        df = pd.DataFrame(columns=columns)
+        for root, _, files in os.walk(sys.argv[2]):
+            for file in files:
+                if file.endswith('.obj'):
+                    full_path = os.path.join(root, file)
+                    shape = trimesh.load(full_path)
+                    features = compute_features(shape)
+                    df.loc[len(df)] = features
+        df.to_csv(sys.argv[3], index=False)
     else:
         print(help)

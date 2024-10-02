@@ -133,7 +133,7 @@ def refine_pass(function, path: str, passes: int, lower: int, upper: int) -> Non
             print(error)
 
 if __name__ == "__main__":
-    help = "Usage:\n-f: Refine a single file\n-a: Refine all files in a directory. Arg: dir path\n-h: Display this help message"
+    help = "Usage:\n-f: Refine a single file. Arg: passes\n-a: Refine all files in a directory. Args: passes, dir path\n-h: Display this help message"
     if len(sys.argv) > 1:
         mode = sys.argv[1]
     else:
