@@ -31,4 +31,15 @@ def D3(V1: tuple, V2: tuple, V3: tuple):
 
 def D4(V1: tuple, V2: tuple, V3: tuple, V4: tuple):
     #cube root of volume of tetrahedron formed by 4 vertices
-    return 0
+    #Cayley-Menger formula
+    a = np.linalg.norm(V1-V2)
+    b = np.linalg.norm(V1-V3)
+    c = np.linalg.norm(V1-V4)
+    d = np.linalg.norm(V2-V3)
+    e = np.linalg.norm(V2-V4)
+    f = np.linalg.norm(V3-V4)
+    X = b^2 + c^2 - e^2
+    Y = a^2 + c^2 - f^2
+    Z = a^2 + b^2 - d^2
+    Volume = np.sqrt(4*a^2*b^2*c^2 - a^2*X - b^2*Y - c^2*Z + X*Y*Z)/12
+    return np.cbrt(Volume)
