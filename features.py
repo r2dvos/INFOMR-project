@@ -2,6 +2,7 @@ import sys
 import math
 from enum import IntEnum
 import os
+import subprocess
 
 import trimesh
 import tkinter as tk
@@ -18,42 +19,37 @@ class Features(IntEnum):
     Convexity = 4
     Eccentricity = 5
 
-def compute_features(mesh: trimesh.Trimesh) -> list[float]:
+def compute_features(mesh: trimesh.Trimesh, path: str) -> list[float]:
     features = []
     
-    vertices = mesh.vertices
     area = mesh.area
     volume = mesh.volume
 
     # Surface Area
-    features.append(area)
+    features.append(float(area))
     
     # Compactness
     compactness = (area ** 2) / (4 * math.pi * volume)
-    features.append(compactness)
+    features.append(float(compactness))
     
     # 3D Regularity
     obb_volume = mesh.bounding_box_oriented.volume
     three_d_regularity = volume / obb_volume
-    features.append(three_d_regularity)
+    features.append(float(three_d_regularity))
     
     # Diameter
-    features.append(0)
-    # TODO: Need something faster than this
-    #for i in range(len(vertices)):
-        #for j in range(i + 1, len(vertices)):
-            #distance = np.linalg.norm(vertices[i] - vertices[j])
-            #if distance > features[Features.Diameter]:
-                #features[Features.Diameter] = distance
+    result = subprocess.run(["gdiam_test.exe", path], capture_output=True)
+    diameter = float(result.stdout.strip())
+    features.append(diameter)
 
     # Convexity
     convex_hull_volume = mesh.convex_hull.volume
     convexity = volume / convex_hull_volume
-    features.append(convexity)
+    features.append(float(convexity))
     
     # Eccentricity
     (_, _, largest_eigenvalue, second_largest_eigenvalue) = compute_eigenvectors(mesh.vertices)
-    features.append(largest_eigenvalue / second_largest_eigenvalue)
+    features.append(float(largest_eigenvalue / second_largest_eigenvalue))
     
     return features
 
@@ -72,7 +68,7 @@ if __name__ == "__main__":
         objFile = filedialog.askopenfilename(initialdir = "../../ShapeDatabase_INFOMR_copy")
         shape = trimesh.load(objFile)
 
-        features = compute_features(shape)
+        features = compute_features(shape, objFile)
         print(features)
     elif mode == "-a" and len(sys.argv) > 3:
         columns = ["Surface Area", "Compactness", "3D Regularity", "Diameter", "Convexity", "Eccentricity"]
@@ -82,8 +78,9 @@ if __name__ == "__main__":
                 if file.endswith('.obj'):
                     full_path = os.path.join(root, file)
                     shape = trimesh.load(full_path)
-                    features = compute_features(shape)
+                    features = compute_features(shape, full_path)
                     df.loc[len(df)] = features
+                    print(f"Features for {full_path} computed.")
         df.to_csv(sys.argv[3], index=False)
     else:
         print(help)
