@@ -38,6 +38,8 @@ def compute_features(mesh: trimesh.Trimesh, path: str) -> list[float]:
     features.append(float(three_d_regularity))
     
     # Diameter
+    # Check: https://sarielhp.org/research/papers/00/diameter/diam_prog.html
+    # for more details on the algorithm used to compute the diameter
     result = subprocess.run(["gdiam_test.exe", path], capture_output=True)
     diameter = float(result.stdout.strip())
     features.append(diameter)
