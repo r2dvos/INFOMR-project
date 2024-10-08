@@ -5,11 +5,13 @@ from vedo import Mesh
 import numpy as np
 
 def A3(V1: tuple, V2: tuple, V3: tuple):
-    #angle between three vertices
-    V12 = V2 - V1
-    V23 = V3 - V2
+    #angle between three vertices in radians
+    V12 = np.array(V2) - np.array(V1)
+    V23 = np.array(V3) - np.array(V2)
     V12_mag = np.linalg.norm(V12)
     V23_mag = np.linalg.norm(V23)
+    if V12_mag == 0 or V23_mag == 0:
+        print("0 detect")
     angle = np.arccos(np.dot(V12,V23)/(V12_mag*V23_mag))
     return angle
 
@@ -32,6 +34,7 @@ def D3(V1: tuple, V2: tuple, V3: tuple):
 def D4(V1: tuple, V2: tuple, V3: tuple, V4: tuple):
     #cube root of volume of tetrahedron formed by 4 vertices
     #Cayley-Menger formula
+    """
     a = np.linalg.norm(V1-V2)
     b = np.linalg.norm(V1-V3)
     c = np.linalg.norm(V1-V4)
@@ -42,4 +45,17 @@ def D4(V1: tuple, V2: tuple, V3: tuple, V4: tuple):
     Y = a**2 + c**2 - f**2
     Z = a**2 + b**2 - d**2
     Volume = np.sqrt(4*a**2*b**2*c**2 - a**2*X - b**2*Y - c**2*Z + X*Y*Z)/12
+    return np.cbrt(Volume)
+    """
+    matrix = np.array([
+        [V1[0], V1[1], V1[2], 1],
+        [V2[0], V2[1], V2[2], 1],
+        [V3[0], V3[1], V3[2], 1],
+        [V4[0], V4[1], V4[2], 1]
+    ])
+
+    det = np.linalg.det(matrix)
+
+    # The volume of the tetrahedron
+    Volume = abs(det) / 6
     return np.cbrt(Volume)
