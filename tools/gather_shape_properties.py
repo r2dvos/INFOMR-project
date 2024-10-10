@@ -10,7 +10,8 @@ from vedo import Mesh, load
 import numpy as np
 from shape_property_descriptors import A3, D1, D2, D3, D4
 
-ANALYSIS_VALUES: int = 2000
+ANALYSIS_VALUES_1: int = 4000
+ANALYSIS_VALUES: int = 10000
 
 def get_shape_class(file_path: str) -> str:
     return os.path.basename(os.path.dirname(file_path))
@@ -31,23 +32,23 @@ def write_properties(db_path: str, output_path: str) -> None:
 
                 """
                 data_A3 = []
-                random_array_A3 = np.random.choice(range(len(shape.vertices)), ANALYSIS_VALUES * 3, replace=False)
+                random_array_A3 = np.random.choice(range(len(shape.vertices)), ANALYSIS_VALUES * 3, replace=True)
                 random_array_A3_0 = random_array_A3[0:ANALYSIS_VALUES]
                 random_array_A3_1 = random_array_A3[ANALYSIS_VALUES + 1:ANALYSIS_VALUES * 2]
                 random_array_A3_2 = random_array_A3[(ANALYSIS_VALUES * 2) + 1:ANALYSIS_VALUES * 3]
                 data_D1 = []
-                random_array_D1_0 = np.random.choice(range(len(shape.vertices)), ANALYSIS_VALUES, replace=False)
+                random_array_D1_0 = np.random.choice(range(len(shape.vertices)), ANALYSIS_VALUES_1, replace=True)
                 data_D2 = []
-                random_array_D2 = np.random.choice(range(len(shape.vertices)), ANALYSIS_VALUES * 2, replace=False)
+                random_array_D2 = np.random.choice(range(len(shape.vertices)), ANALYSIS_VALUES * 2, replace=True)
                 random_array_D2_0 = random_array_D2[0:ANALYSIS_VALUES]
                 random_array_D2_1 = random_array_D2[ANALYSIS_VALUES + 1:ANALYSIS_VALUES * 2]
                 data_D3 = []
-                random_array_D3 = np.random.choice(range(len(shape.vertices)), ANALYSIS_VALUES * 3, replace=False)
+                random_array_D3 = np.random.choice(range(len(shape.vertices)), ANALYSIS_VALUES * 3, replace=True)
                 random_array_D3_0 = random_array_D3[0:ANALYSIS_VALUES]
                 random_array_D3_1 = random_array_D3[ANALYSIS_VALUES + 1:ANALYSIS_VALUES * 2]
                 random_array_D3_2 = random_array_D3[(ANALYSIS_VALUES * 2) + 1:ANALYSIS_VALUES * 3]
                 data_D4 = []
-                random_array_D4 = np.random.choice(range(len(shape.vertices)), ANALYSIS_VALUES * 4, replace=False)
+                random_array_D4 = np.random.choice(range(len(shape.vertices)), ANALYSIS_VALUES * 4, replace=True)
                 random_array_D4_0 = random_array_D4[0:ANALYSIS_VALUES]
                 random_array_D4_1 = random_array_D4[ANALYSIS_VALUES + 1:ANALYSIS_VALUES * 2]
                 random_array_D4_2 = random_array_D4[(ANALYSIS_VALUES * 2) + 1:ANALYSIS_VALUES * 3]
@@ -56,57 +57,67 @@ def write_properties(db_path: str, output_path: str) -> None:
 
                 data_A3 = []
                 total_value_A3 = 0
+                count_value_A3 = 0
                 greatest_value_A3 = 0
-                random_array_A3_0 = np.random.choice(range(len(shape.vertices)), ANALYSIS_VALUES, replace=False)
-                random_array_A3_1 = np.random.choice(range(len(shape.vertices)), ANALYSIS_VALUES, replace=False)
-                random_array_A3_2 = np.random.choice(range(len(shape.vertices)), ANALYSIS_VALUES, replace=False)
+                random_array_A3_0 = np.random.choice(range(len(shape.vertices)), ANALYSIS_VALUES, replace=True)
+                random_array_A3_1 = np.random.choice(range(len(shape.vertices)), ANALYSIS_VALUES, replace=True)
+                random_array_A3_2 = np.random.choice(range(len(shape.vertices)), ANALYSIS_VALUES, replace=True)
                 data_D1 = []
                 total_value_D1 = 0
+                count_value_D1 = 0
                 greatest_value_D1 = 0
-                random_array_D1_0 = np.random.choice(range(len(shape.vertices)), ANALYSIS_VALUES, replace=False)
+                random_array_D1_0 = np.random.choice(range(len(shape.vertices)), ANALYSIS_VALUES_1, replace=True)
                 data_D2 = []
                 total_value_D2 = 0
+                count_value_D2 = 0
                 greatest_value_D2 = 0
-                random_array_D2_0 = np.random.choice(range(len(shape.vertices)), ANALYSIS_VALUES, replace=False)
-                random_array_D2_1 = np.random.choice(range(len(shape.vertices)), ANALYSIS_VALUES, replace=False)
+                random_array_D2_0 = np.random.choice(range(len(shape.vertices)), ANALYSIS_VALUES, replace=True)
+                random_array_D2_1 = np.random.choice(range(len(shape.vertices)), ANALYSIS_VALUES, replace=True)
                 data_D3 = []
                 total_value_D3 = 0
+                count_value_D3 = 0
                 greatest_value_D3 = 0
-                random_array_D3_0 = np.random.choice(range(len(shape.vertices)), ANALYSIS_VALUES, replace=False)
-                random_array_D3_1 = np.random.choice(range(len(shape.vertices)), ANALYSIS_VALUES, replace=False)
-                random_array_D3_2 = np.random.choice(range(len(shape.vertices)), ANALYSIS_VALUES, replace=False)
+                random_array_D3_0 = np.random.choice(range(len(shape.vertices)), ANALYSIS_VALUES, replace=True)
+                random_array_D3_1 = np.random.choice(range(len(shape.vertices)), ANALYSIS_VALUES, replace=True)
+                random_array_D3_2 = np.random.choice(range(len(shape.vertices)), ANALYSIS_VALUES, replace=True)
                 data_D4 = []
                 total_value_D4 = 0
+                count_value_D4 = 0
                 greatest_value_D4 = 0
-                random_array_D4_0 = np.random.choice(range(len(shape.vertices)), ANALYSIS_VALUES, replace=False)
-                random_array_D4_1 = np.random.choice(range(len(shape.vertices)), ANALYSIS_VALUES, replace=False)
-                random_array_D4_2 = np.random.choice(range(len(shape.vertices)), ANALYSIS_VALUES, replace=False)
-                random_array_D4_3 = np.random.choice(range(len(shape.vertices)), ANALYSIS_VALUES, replace=False)
+                random_array_D4_0 = np.random.choice(range(len(shape.vertices)), ANALYSIS_VALUES, replace=True)
+                random_array_D4_1 = np.random.choice(range(len(shape.vertices)), ANALYSIS_VALUES, replace=True)
+                random_array_D4_2 = np.random.choice(range(len(shape.vertices)), ANALYSIS_VALUES, replace=True)
+                random_array_D4_3 = np.random.choice(range(len(shape.vertices)), ANALYSIS_VALUES, replace=True)
 
                 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                 # Part 1: calculations
                 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                 for i in range(ANALYSIS_VALUES):
-                    D1_val = D1(shape.vertices[random_array_D1_0[i]])
-                    data_D1.append(D1_val)
-                    total_value_D1 = total_value_D1 + D1_val
-                    if D1_val > greatest_value_D1:
-                        greatest_value_D1 = D1_val
+                    if i < ANALYSIS_VALUES_1:
+                        D1_val = D1(shape.vertices[random_array_D1_0[i]])
+                        data_D1.append(D1_val)
+                        count_value_D1 = count_value_D1 + 1
+                        total_value_D1 = total_value_D1 + D1_val
+                        if D1_val > greatest_value_D1:
+                            greatest_value_D1 = D1_val
                     if random_array_D2_0[i] != random_array_D2_1[i]:
                         D2_val = D2(shape.vertices[random_array_D2_0[i]], shape.vertices[random_array_D2_1[i]])
                         data_D2.append(D2_val)
+                        count_value_D2 = count_value_D2 + 1
                         total_value_D2 = total_value_D2 + D2_val
                         if D2_val > greatest_value_D2:
                             greatest_value_D2 = D2_val
                     if random_array_A3_0[i] != random_array_A3_1[i] and random_array_A3_0[i] != random_array_A3_2[i] and random_array_A3_1[i] != random_array_A3_2[i]:
                         A3_val = A3(shape.vertices[random_array_A3_0[i]], shape.vertices[random_array_A3_1[i]], shape.vertices[random_array_A3_2[i]])
                         data_A3.append(A3_val)
+                        count_value_A3 = count_value_A3 + 1
                         total_value_A3 = total_value_A3 + A3_val
                         if A3_val > greatest_value_A3:
                             greatest_value_A3 = A3_val
                     if random_array_D3_0[i] != random_array_D3_1[i] and random_array_D3_0[i] != random_array_D3_2[i] and random_array_D3_1[i] != random_array_D3_2[i]:
                         D3_val = D3(shape.vertices[random_array_D3_0[i]], shape.vertices[random_array_D3_1[i]], shape.vertices[random_array_D3_2[i]])
                         data_D3.append(D3_val)
+                        count_value_D3 = count_value_D3 + 1
                         total_value_D3 = total_value_D3 + D3_val
                         if D3_val > greatest_value_D3:
                             greatest_value_D3 = D3_val
@@ -114,6 +125,7 @@ def write_properties(db_path: str, output_path: str) -> None:
                        random_array_D4_1[i] != random_array_D4_2[i] and random_array_D4_1[i] != random_array_D4_3[i] and random_array_D4_2[i] != random_array_D4_3[i]):
                         D4_val = D4(shape.vertices[random_array_D4_0[i]], shape.vertices[random_array_D4_1[i]], shape.vertices[random_array_D4_2[i]], shape.vertices[random_array_D4_3[i]])
                         data_D4.append(D4_val)
+                        count_value_D4 = count_value_D4 + 1
                         total_value_D4 = total_value_D4 + D4_val
                         if D4_val > greatest_value_D4:
                             greatest_value_D4 = D4_val
@@ -155,7 +167,7 @@ def get_shape_properties(input_csv: str) -> None:
     print("A3: angle between 3 random vertices")
     print("~~\n")
 
-    n, x = np.histogram(df['A3'].dropna(), bins=100)
+    n, x = np.histogram(df['A3'].dropna(), bins=500)
     bin_centers = 0.5*(x[1:]+x[:-1])
     plt.plot(bin_centers,n)
     plt.title("A3: angle between 3 random vertices")
@@ -167,7 +179,7 @@ def get_shape_properties(input_csv: str) -> None:
     print("D1: distance between barycenter and random vertex")
     print("~~\n")
 
-    n, x = np.histogram(df['D1'].dropna(), bins=100)
+    n, x = np.histogram(df['D1'].dropna(), bins=200)
     bin_centers = 0.5*(x[1:]+x[:-1])
     plt.plot(bin_centers,n)
     plt.title("D1: distance between barycenter and random vertex")
@@ -179,7 +191,7 @@ def get_shape_properties(input_csv: str) -> None:
     print("D2: distance between 2 random vertices")
     print("~~\n")
 
-    n, x = np.histogram(df['D2'].dropna(), bins=100)
+    n, x = np.histogram(df['D2'].dropna(), bins=500)
     bin_centers = 0.5*(x[1:]+x[:-1])
     plt.plot(bin_centers,n)
     plt.title("D2: distance between 2 random vertices")
@@ -191,7 +203,7 @@ def get_shape_properties(input_csv: str) -> None:
     print("D3: square root of area of triangle given by 3 random vertices")
     print("~~\n")
 
-    n, x = np.histogram(df['D3'].dropna(), bins=100)
+    n, x = np.histogram(df['D3'].dropna(), bins=500)
     bin_centers = 0.5*(x[1:]+x[:-1])
     plt.plot(bin_centers,n)
     plt.title("D3: square root of area of triangle given by 3 random vertices")
@@ -203,7 +215,7 @@ def get_shape_properties(input_csv: str) -> None:
     print("D4: cube root of volume of tetrahedron formed by 4 random vertices")
     print("~~\n")
 
-    n, x = np.histogram(df['D4'].dropna(), bins=100)
+    n, x = np.histogram(df['D4'].dropna(), bins=500)
     bin_centers = 0.5*(x[1:]+x[:-1])
     plt.plot(bin_centers,n)
     plt.title("D4: cube root of volume of tetrahedron formed by 4 random vertices")
@@ -224,7 +236,7 @@ def get_group_properties(group_path: str) -> None:
             if file.endswith('.csv'):
                 csv_path = os.path.join(root, file)
                 df = pd.read_csv(csv_path)
-                n, x = np.histogram(df['A3'].dropna(), bins=100)
+                n, x = np.histogram(df['A3'].dropna(), bins=500)
                 bin_centers = 0.5*(x[1:]+x[:-1])
                 plt.plot(bin_centers,n)
 
@@ -241,7 +253,7 @@ def get_group_properties(group_path: str) -> None:
             if file.endswith('.csv'):
                 csv_path = os.path.join(root, file)
                 df = pd.read_csv(csv_path)
-                n, x = np.histogram(df['D1'].dropna(), bins=100)
+                n, x = np.histogram(df['D1'].dropna(), bins=200)
                 bin_centers = 0.5*(x[1:]+x[:-1])
                 plt.plot(bin_centers,n)
 
@@ -258,7 +270,7 @@ def get_group_properties(group_path: str) -> None:
             if file.endswith('.csv'):
                 csv_path = os.path.join(root, file)
                 df = pd.read_csv(csv_path)
-                n, x = np.histogram(df['D2'].dropna(), bins=100)
+                n, x = np.histogram(df['D2'].dropna(), bins=500)
                 bin_centers = 0.5*(x[1:]+x[:-1])
                 plt.plot(bin_centers,n)
 
@@ -275,7 +287,7 @@ def get_group_properties(group_path: str) -> None:
             if file.endswith('.csv'):
                 csv_path = os.path.join(root, file)
                 df = pd.read_csv(csv_path)
-                n, x = np.histogram(df['D3'].dropna(), bins=100)
+                n, x = np.histogram(df['D3'].dropna(), bins=500)
                 bin_centers = 0.5*(x[1:]+x[:-1])
                 plt.plot(bin_centers,n)
 
@@ -292,7 +304,7 @@ def get_group_properties(group_path: str) -> None:
             if file.endswith('.csv'):
                 csv_path = os.path.join(root, file)
                 df = pd.read_csv(csv_path)
-                n, x = np.histogram(df['D4'].dropna(), bins=100)
+                n, x = np.histogram(df['D4'].dropna(), bins=500)
                 bin_centers = 0.5*(x[1:]+x[:-1])
                 plt.plot(bin_centers,n)
 
