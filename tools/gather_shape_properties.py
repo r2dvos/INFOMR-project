@@ -6,9 +6,10 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from pathlib import Path
 
-from vedo import Mesh, load
+import trimesh
 import numpy as np
 from shape_property_descriptors import A3, D1, D2, D3, D4
+from features import compute_features
 
 ANALYSIS_VALUES: int = 2000
 
@@ -20,6 +21,7 @@ def get_shape_class(file_path: str) -> str:
 #
 
 def write_properties(db_path: str, output_path: str) -> None:
+    big_database = []
     for root, _, files in os.walk(db_path):
         for file in files:
             if file.endswith('.obj'):
@@ -27,7 +29,7 @@ def write_properties(db_path: str, output_path: str) -> None:
                 shape_class = get_shape_class(obj_path)
                 print("extracting properties of " + shape_class + "/" + file)
 
-                shape: Mesh = load(obj_path)
+                shape: trimesh.Trimesh = trimesh.load(obj_path)
 
                 """
                 data_A3 = []
@@ -117,6 +119,8 @@ def write_properties(db_path: str, output_path: str) -> None:
                         total_value_D4 = total_value_D4 + D4_val
                         if D4_val > greatest_value_D4:
                             greatest_value_D4 = D4_val
+                
+                (area, compactness, regularity, diameter, convexity, eccencitry) = compute_features(shape, obj_path)
                 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                 # Part 2: normalizations 
                 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -143,6 +147,11 @@ def write_properties(db_path: str, output_path: str) -> None:
                 df = pd.DataFrame(dict([(c, pd.Series(v)) for c, v in data_dict.items()]))
                 output_csv = file.replace(".obj", ".csv")
                 df.to_csv(output_path + "/" + shape_class + "/" + output_csv, index=False)
+
+                big_database.append((shape_class, file, area, compactness, regularity, diameter, convexity, eccencitry, data_A3, data_D1, data_D2, data_D3, data_D4))
+                
+    big_df = pd.DataFrame(big_database, columns=["Class", "File", "Area", "Compactness", "Regularity", "Diameter", "Convexity", "Eccentricity", "A3", "D1", "D2", "D3", "D4"])
+    big_df.to_csv(output_path + "/big_database.csv", index=False)
 
 #
 #~~~~~~~~~

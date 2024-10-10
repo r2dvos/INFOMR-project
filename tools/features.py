@@ -9,7 +9,7 @@ import tkinter as tk
 from tkinter import filedialog
 import pandas as pd
 
-from tools.normalization import compute_eigenvectors
+from normalization import compute_eigenvectors
 
 class Features(IntEnum):
     SurfaceArea = 0
