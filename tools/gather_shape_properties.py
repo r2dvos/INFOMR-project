@@ -21,7 +21,7 @@ def get_shape_class(file_path: str) -> str:
 #~~~~~~~~~
 #
 
-def write_properties(db_path: str, output_path: str) -> None:
+def write_properties(db_path: str, output_path: str, big_db_name: str) -> None:
     big_database = []
     for root, _, files in os.walk(db_path):
         for file in files:
@@ -31,6 +31,7 @@ def write_properties(db_path: str, output_path: str) -> None:
                 print("extracting properties of " + shape_class + "/" + file)
 
                 shape: trimesh.Trimesh = trimesh.load(obj_path)
+                (area, compactness, regularity, diameter, convexity, eccencitry) = compute_features(shape, obj_path)
 
                 """
                 data_A3 = []
@@ -58,95 +59,60 @@ def write_properties(db_path: str, output_path: str) -> None:
                 """
 
                 data_A3 = []
-                total_value_A3 = 0
-                count_value_A3 = 0
-                greatest_value_A3 = 0
                 random_array_A3_0 = np.random.choice(range(len(shape.vertices)), ANALYSIS_VALUES, replace=True)
                 random_array_A3_1 = np.random.choice(range(len(shape.vertices)), ANALYSIS_VALUES, replace=True)
                 random_array_A3_2 = np.random.choice(range(len(shape.vertices)), ANALYSIS_VALUES, replace=True)
                 data_D1 = []
-                total_value_D1 = 0
-                count_value_D1 = 0
-                greatest_value_D1 = 0
                 random_array_D1_0 = np.random.choice(range(len(shape.vertices)), ANALYSIS_VALUES_1, replace=True)
                 data_D2 = []
-                total_value_D2 = 0
-                count_value_D2 = 0
-                greatest_value_D2 = 0
                 random_array_D2_0 = np.random.choice(range(len(shape.vertices)), ANALYSIS_VALUES, replace=True)
                 random_array_D2_1 = np.random.choice(range(len(shape.vertices)), ANALYSIS_VALUES, replace=True)
                 data_D3 = []
-                total_value_D3 = 0
-                count_value_D3 = 0
-                greatest_value_D3 = 0
                 random_array_D3_0 = np.random.choice(range(len(shape.vertices)), ANALYSIS_VALUES, replace=True)
                 random_array_D3_1 = np.random.choice(range(len(shape.vertices)), ANALYSIS_VALUES, replace=True)
                 random_array_D3_2 = np.random.choice(range(len(shape.vertices)), ANALYSIS_VALUES, replace=True)
                 data_D4 = []
-                total_value_D4 = 0
-                count_value_D4 = 0
-                greatest_value_D4 = 0
                 random_array_D4_0 = np.random.choice(range(len(shape.vertices)), ANALYSIS_VALUES, replace=True)
                 random_array_D4_1 = np.random.choice(range(len(shape.vertices)), ANALYSIS_VALUES, replace=True)
                 random_array_D4_2 = np.random.choice(range(len(shape.vertices)), ANALYSIS_VALUES, replace=True)
                 random_array_D4_3 = np.random.choice(range(len(shape.vertices)), ANALYSIS_VALUES, replace=True)
 
                 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                # Part 1: calculations
+                # Part 1: value calculations
                 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                 for i in range(ANALYSIS_VALUES):
                     if i < ANALYSIS_VALUES_1:
                         D1_val = D1(shape.vertices[random_array_D1_0[i]])
                         data_D1.append(D1_val)
-                        count_value_D1 = count_value_D1 + 1
-                        total_value_D1 = total_value_D1 + D1_val
-                        if D1_val > greatest_value_D1:
-                            greatest_value_D1 = D1_val
                     if random_array_D2_0[i] != random_array_D2_1[i]:
                         D2_val = D2(shape.vertices[random_array_D2_0[i]], shape.vertices[random_array_D2_1[i]])
                         data_D2.append(D2_val)
-                        count_value_D2 = count_value_D2 + 1
-                        total_value_D2 = total_value_D2 + D2_val
-                        if D2_val > greatest_value_D2:
-                            greatest_value_D2 = D2_val
                     if random_array_A3_0[i] != random_array_A3_1[i] and random_array_A3_0[i] != random_array_A3_2[i] and random_array_A3_1[i] != random_array_A3_2[i]:
                         A3_val = A3(shape.vertices[random_array_A3_0[i]], shape.vertices[random_array_A3_1[i]], shape.vertices[random_array_A3_2[i]])
                         data_A3.append(A3_val)
-                        count_value_A3 = count_value_A3 + 1
-                        total_value_A3 = total_value_A3 + A3_val
-                        if A3_val > greatest_value_A3:
-                            greatest_value_A3 = A3_val
                     if random_array_D3_0[i] != random_array_D3_1[i] and random_array_D3_0[i] != random_array_D3_2[i] and random_array_D3_1[i] != random_array_D3_2[i]:
                         D3_val = D3(shape.vertices[random_array_D3_0[i]], shape.vertices[random_array_D3_1[i]], shape.vertices[random_array_D3_2[i]])
                         data_D3.append(D3_val)
-                        count_value_D3 = count_value_D3 + 1
-                        total_value_D3 = total_value_D3 + D3_val
-                        if D3_val > greatest_value_D3:
-                            greatest_value_D3 = D3_val
                     if(random_array_D4_0[i] != random_array_D4_1[i] and random_array_D4_0[i] != random_array_D4_2[i] and random_array_D4_0[i] != random_array_D4_3[i] and
                        random_array_D4_1[i] != random_array_D4_2[i] and random_array_D4_1[i] != random_array_D4_3[i] and random_array_D4_2[i] != random_array_D4_3[i]):
                         D4_val = D4(shape.vertices[random_array_D4_0[i]], shape.vertices[random_array_D4_1[i]], shape.vertices[random_array_D4_2[i]], shape.vertices[random_array_D4_3[i]])
                         data_D4.append(D4_val)
-                        count_value_D4 = count_value_D4 + 1
-                        total_value_D4 = total_value_D4 + D4_val
-                        if D4_val > greatest_value_D4:
-                            greatest_value_D4 = D4_val
-                
-                (area, compactness, regularity, diameter, convexity, eccencitry) = compute_features(shape, obj_path)
                 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                # Part 2: normalizations 
+                # Part 2: bin calculations
                 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                for i in range(ANALYSIS_VALUES):
-                    if i < len(data_D1):
-                        data_D1[i] = data_D1[i]/greatest_value_D1
-                    if i < len(data_D2):
-                        data_D2[i] = data_D2[i]/greatest_value_D2
-                    if i < len(data_A3):
-                        data_A3[i] = data_A3[i]/greatest_value_A3
-                    if i < len(data_D3):
-                        data_D3[i] = data_D3[i]/greatest_value_D3
-                    if i < len(data_D4):
-                        data_D4[i] = data_D4[i]/greatest_value_D4
+                hist_A3, bins_A3 = np.histogram(df['A3'].dropna(), bins=500)
+                hist_D1, bins_D1 = np.histogram(df['D1'].dropna(), bins=200)
+                hist_D2, bins_D2 = np.histogram(df['D2'].dropna(), bins=500)
+                hist_D3, bins_D3 = np.histogram(df['D3'].dropna(), bins=500)
+                hist_D4, bins_D4 = np.histogram(df['D4'].dropna(), bins=500)
+                #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                # Part 3: bin normalization
+                #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                bins_A3[:] = [b / 500 for b in bins_A3]
+                bins_D1[:] = [b / 200 for b in bins_D1]
+                bins_D2[:] = [b / 500 for b in bins_D2]
+                bins_D3[:] = [b / 500 for b in bins_D3]
+                bins_D4[:] = [b / 500 for b in bins_D4]
                 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
                 data_dict = dict(A3 = data_A3,
@@ -160,10 +126,10 @@ def write_properties(db_path: str, output_path: str) -> None:
                 output_csv = file.replace(".obj", ".csv")
                 df.to_csv(output_path + "/" + shape_class + "/" + output_csv, index=False)
 
-                big_database.append((shape_class, file, area, compactness, regularity, diameter, convexity, eccencitry, data_A3, data_D1, data_D2, data_D3, data_D4))
+                big_database.append((shape_class, file, area, compactness, regularity, diameter, convexity, eccencitry, bins_A3, bins_D1, bins_D2, bins_D3, bins_D4))
                 
     big_df = pd.DataFrame(big_database, columns=["Class", "File", "Area", "Compactness", "Regularity", "Diameter", "Convexity", "Eccentricity", "A3", "D1", "D2", "D3", "D4"])
-    big_df.to_csv(output_path + "/big_database.csv", index=False)
+    big_df.to_csv(output_path + "/" + big_db_name, index=False)
 
 #
 #~~~~~~~~~
@@ -327,7 +293,7 @@ def get_group_properties(group_path: str) -> None:
 #
 
 if __name__ == "__main__":
-    help = "Usage:\n-d: Select a database to gather shape properties. Args: path to database, output folder\n-f: View shape properties of a single shape. Args: data csv\n-c: View shape properties of a category. Args: path to folder containing data csvs.\n-h: Display this help message"
+    help = "Usage:\n-d: Select a database to gather shape properties. Args: path to database, output folder, big csv database name\n-f: View shape properties of a single shape. Args: data csv\n-c: View shape properties of a category. Args: path to folder containing data csvs.\n-h: Display this help message"
     if len(sys.argv) > 1:
         mode = sys.argv[1]
     else:
@@ -338,7 +304,7 @@ if __name__ == "__main__":
         get_shape_properties(sys.argv[2])
     elif mode == "-c" and len(sys.argv) == 3:
         get_group_properties(sys.argv[2])
-    elif mode == "-d" and len(sys.argv) == 4:
-        write_properties(sys.argv[2], sys.argv[3])
+    elif mode == "-d" and len(sys.argv) == 5:
+        write_properties(sys.argv[2], sys.argv[3], sys.argv[4])
     else:
         print(help)
