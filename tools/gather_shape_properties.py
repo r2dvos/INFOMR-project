@@ -100,11 +100,11 @@ def write_properties(db_path: str, output_path: str, big_db_name: str) -> None:
                 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                 # Part 2: bin calculations
                 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                hist_A3, bins_A3 = np.histogram(df['A3'].dropna(), bins=500)
-                hist_D1, bins_D1 = np.histogram(df['D1'].dropna(), bins=200)
-                hist_D2, bins_D2 = np.histogram(df['D2'].dropna(), bins=500)
-                hist_D3, bins_D3 = np.histogram(df['D3'].dropna(), bins=500)
-                hist_D4, bins_D4 = np.histogram(df['D4'].dropna(), bins=500)
+                hist_A3, bins_A3 = np.histogram(pd.DataFrame({'A3': data_A3}).dropna(), bins=500)
+                hist_D1, bins_D1 = np.histogram(pd.DataFrame({'D1': data_D1}).dropna(), bins=200)
+                hist_D2, bins_D2 = np.histogram(pd.DataFrame({'D2': data_D2}).dropna(), bins=500)
+                hist_D3, bins_D3 = np.histogram(pd.DataFrame({'D3': data_D3}).dropna(), bins=500)
+                hist_D4, bins_D4 = np.histogram(pd.DataFrame({'D4': data_D4}).dropna(), bins=500)
                 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                 # Part 3: bin normalization
                 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
