@@ -15,7 +15,7 @@ def check_translation(shape: Mesh):
     return abs(barycenter[0] ** 3) + abs(barycenter[1] ** 3) + abs(barycenter[2] ** 3)
 
 def check_rotation(shape: Mesh):
-    (largest_eigenvector, _, _, _) = compute_eigenvectors(shape.vertices)
+    (largest_eigenvector, _, _, _, _) = compute_eigenvectors(shape.vertices)
     return (largest_eigenvector[0] - 1) + largest_eigenvector[1] + largest_eigenvector[2]
 
 def check_flip(shape: Mesh):
@@ -46,7 +46,7 @@ def write_normals(path: str, output_csv: str) -> None:
 
                 barycenter = compute_barycenter(shape.cells, shape.vertices, shape.cell_centers)
                 barycenter_err = check_translation(shape)
-                (rotation, _, _, _) = compute_eigenvectors(shape.vertices)
+                (rotation, _, _, _, _) = compute_eigenvectors(shape.vertices)
                 rotation_err = check_rotation(shape)
                 flip = compute_flip(shape.vertices)
                 flip_err = check_flip(shape)

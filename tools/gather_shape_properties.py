@@ -31,7 +31,11 @@ def write_properties(db_path: str, output_path: str, big_db_name: str) -> None:
                 print("extracting properties of " + shape_class + "/" + file)
 
                 shape: trimesh.Trimesh = trimesh.load(obj_path)
-                #(area, compactness, regularity, diameter, convexity, eccencitry) = compute_features(shape, obj_path)
+                if not shape.is_watertight:
+                    trimesh.repair.fill_holes(shape)
+                    trimesh.repair.fix_winding(shape)
+                    trimesh.repair.fix_normals(shape)
+                (area, compactness, regularity, diameter, convexity, eccencitry) = compute_features(shape, obj_path)
 
                 """
                 data_A3 = []

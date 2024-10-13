@@ -50,8 +50,8 @@ def compute_features(mesh: trimesh.Trimesh, path: str) -> list[float]:
     features.append(float(convexity))
     
     # Eccentricity
-    (_, _, largest_eigenvalue, second_largest_eigenvalue) = compute_eigenvectors(mesh.vertices)
-    features.append(float(largest_eigenvalue / second_largest_eigenvalue))
+    (_, _, largest_eigenvalue, _, third_largest_eigenvalue) = compute_eigenvectors(mesh.vertices)
+    features.append(float(largest_eigenvalue / third_largest_eigenvalue))
     
     return features
 

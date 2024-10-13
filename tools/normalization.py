@@ -36,7 +36,8 @@ def compute_eigenvectors(points: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
     second_largest_eigenvector = eigenvectors[:, sorted_indices[1]]
     largest_eigenvalue = eigenvalues[sorted_indices[0]]
     second_largest_eigenvalue = eigenvalues[sorted_indices[1]]
-    return (largest_eigenvector, second_largest_eigenvector, largest_eigenvalue, second_largest_eigenvalue)
+    third_largest_eigenvalue = eigenvalues[sorted_indices[2]]
+    return (largest_eigenvector, second_largest_eigenvector, largest_eigenvalue, second_largest_eigenvalue, third_largest_eigenvalue)
 
 def compute_flip(points: np.ndarray) -> list[int]:
     moment_x = 0
@@ -66,7 +67,7 @@ def normalize_shape(shape: Mesh) -> Mesh:
 
     # Rotation normalization
     points = shape.vertices
-    (largest_eigenvector, second_largest_eigenvector, _, _) = compute_eigenvectors(shape.vertices)
+    (largest_eigenvector, second_largest_eigenvector, _, _, _) = compute_eigenvectors(shape.vertices)
     rotation_matrix = np.eye(3)
     rotation_matrix[:, 0] = largest_eigenvector
     rotation_matrix[:, 1] = second_largest_eigenvector
