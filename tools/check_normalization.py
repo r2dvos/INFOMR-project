@@ -16,7 +16,7 @@ def check_translation(shape: Mesh):
 
 def check_rotation(shape: Mesh):
     (largest_eigenvector, _, _, _, _) = compute_eigenvectors(shape.vertices)
-    return (largest_eigenvector[0] - 1) + largest_eigenvector[1] + largest_eigenvector[2]
+    return abs(abs(largest_eigenvector[0]) - 1) + abs(largest_eigenvector[1]) + abs(largest_eigenvector[2])
 
 def check_flip(shape: Mesh):
     moments = compute_flip(shape.vertices)
