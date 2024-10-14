@@ -10,8 +10,6 @@ def A3(V1: tuple, V2: tuple, V3: tuple):
     V23 = np.array(V3) - np.array(V2)
     V12_mag = np.linalg.norm(V12)
     V23_mag = np.linalg.norm(V23)
-    if V12_mag == 0 or V23_mag == 0:
-        print("0 detect")
     angle = np.arccos(np.dot(V12,V23)/(V12_mag*V23_mag))
     return angle
 

@@ -20,11 +20,42 @@ def get_shape_class(file_path: str) -> str:
 def get_shape_properties(input_csv: str, obj_name: str) -> None:
     df = pd.read_csv(input_csv)
 
+    # Surface Area
+    surface_area = df[df['File'].isin([obj_name])].iloc[0]['Area']
+    print("Surface Area: " + str(surface_area))
+    print("~~")
+
+    # Compactness
+    surface_area = df[df['File'].isin([obj_name])].iloc[0]['Compactness']
+    print("Compactness: " + str(surface_area))
+    print("~~")
+
+    # 3D Regularity
+    surface_area = df[df['File'].isin([obj_name])].iloc[0]['Regularity']
+    print("3D Regularity: " + str(surface_area))
+    print("~~")
+
+    # Diameter
+    surface_area = df[df['File'].isin([obj_name])].iloc[0]['Diameter']
+    print("Diameter: " + str(surface_area))
+    print("~~")
+
+    # Convexity
+    surface_area = df[df['File'].isin([obj_name])].iloc[0]['Convexity']
+    print("SConvexity: " + str(surface_area))
+    print("~~")
+
+    # Eccentricity
+    surface_area = df[df['File'].isin([obj_name])].iloc[0]['Eccentricity']
+    print("Eccentricity: " + str(surface_area))
+    print("~~")
+
     #A3
     print("A3: angle between 3 random vertices")
-    print("~~\n")
+    print("~~")
+
     hist = list(map(float, df[df['File'].isin([obj_name])].iloc[0]['A3'].replace('[', '').replace(']', '').split(', ')))
-    bins = np.array(list(map(float, re.sub(r'\s+', ' ', df[df['File'].isin([obj_name])].iloc[0]['Bins A3'].replace('[', '').replace(']', '').replace('\n', ' ')).split(' '))))
+    bins = np.array(list(map(float, list(filter(('').__ne__, re.sub(r'\s+', ' ', df[df['File'].isin([obj_name])].iloc[0]['Bins A3'].replace('[', '').replace(']', '').replace('\n', ' ')).split(' '))))))
     bin_centers = 0.5*(bins[1:]+bins[:-1])
     plt.plot(bin_centers,hist)
     plt.title("A3: angle between 3 random vertices")
@@ -34,9 +65,10 @@ def get_shape_properties(input_csv: str, obj_name: str) -> None:
 
     #D1
     print("D1: distance between barycenter and random vertex")
-    print("~~\n")
+    print("~~")
+
     hist = list(map(float, df[df['File'].isin([obj_name])].iloc[0]['D1'].replace('[', '').replace(']', '').split(', ')))
-    bins = np.array(list(map(float, re.sub(r'\s+', ' ', df[df['File'].isin([obj_name])].iloc[0]['Bins D1'].replace('[', '').replace(']', '').replace('\n', ' ')).split(' '))))
+    bins = np.array(list(map(float, list(filter(('').__ne__, re.sub(r'\s+', ' ', df[df['File'].isin([obj_name])].iloc[0]['Bins D1'].replace('[', '').replace(']', '').replace('\n', ' ')).split(' '))))))
     bin_centers = 0.5*(bins[1:]+bins[:-1])
     plt.plot(bin_centers,hist)
     plt.title("D1: distance between barycenter and random vertex")
@@ -46,9 +78,10 @@ def get_shape_properties(input_csv: str, obj_name: str) -> None:
 
     #D2
     print("D2: distance between 2 random vertices")
-    print("~~\n")
+    print("~~")
+
     hist = list(map(float, df[df['File'].isin([obj_name])].iloc[0]['D2'].replace('[', '').replace(']', '').split(', ')))
-    bins = np.array(list(map(float, re.sub(r'\s+', ' ', df[df['File'].isin([obj_name])].iloc[0]['Bins D2'].replace('[', '').replace(']', '').replace('\n', ' ')).split(' '))))
+    bins = np.array(list(map(float, list(filter(('').__ne__, re.sub(r'\s+', ' ', df[df['File'].isin([obj_name])].iloc[0]['Bins D2'].replace('[', '').replace(']', '').replace('\n', ' ')).split(' '))))))
     bin_centers = 0.5*(bins[1:]+bins[:-1])
     plt.plot(bin_centers,hist)
     plt.title("D2: distance between 2 random vertices")
@@ -58,9 +91,10 @@ def get_shape_properties(input_csv: str, obj_name: str) -> None:
 
     #D3
     print("D3: square root of area of triangle given by 3 random vertices")
-    print("~~\n")
+    print("~~")
+
     hist = list(map(float, df[df['File'].isin([obj_name])].iloc[0]['D3'].replace('[', '').replace(']', '').split(', ')))
-    bins = np.array(list(map(float, re.sub(r'\s+', ' ', df[df['File'].isin([obj_name])].iloc[0]['Bins D3'].replace('[', '').replace(']', '').replace('\n', ' ')).split(' '))))
+    bins = np.array(list(map(float, list(filter(('').__ne__, re.sub(r'\s+', ' ', df[df['File'].isin([obj_name])].iloc[0]['Bins D3'].replace('[', '').replace(']', '').replace('\n', ' ')).split(' '))))))
     bin_centers = 0.5*(bins[1:]+bins[:-1])
     plt.plot(bin_centers,hist)
     plt.title("D3: square root of area of triangle given by 3 random vertices")
@@ -70,9 +104,10 @@ def get_shape_properties(input_csv: str, obj_name: str) -> None:
 
     #D4
     print("D4: cube root of volume of tetrahedron formed by 4 random vertices")
-    print("~~\n")
+    print("~~")
+
     hist = list(map(float, df[df['File'].isin([obj_name])].iloc[0]['D4'].replace('[', '').replace(']', '').split(', ')))
-    bins = np.array(list(map(float, re.sub(r'\s+', ' ', df[df['File'].isin([obj_name])].iloc[0]['Bins D4'].replace('[', '').replace(']', '').replace('\n', ' ')).split(' '))))
+    bins = np.array(list(map(float, list(filter(('').__ne__, re.sub(r'\s+', ' ', df[df['File'].isin([obj_name])].iloc[0]['Bins D4'].replace('[', '').replace(']', '').replace('\n', ' ')).split(' '))))))
     bin_centers = 0.5*(bins[1:]+bins[:-1])
     plt.plot(bin_centers,hist)
     plt.title("D4: cube root of volume of tetrahedron formed by 4 random vertices")
@@ -84,19 +119,18 @@ def get_shape_properties(input_csv: str, obj_name: str) -> None:
 #~~~~~~~~~
 #
 
-def get_group_properties(group_path: str) -> None:
+def get_group_properties(input_csv: str, group_name: str) -> None:
+    df = pd.read_csv(input_csv)
+
     #A3
     print("A3: angle between 3 random vertices")
-    print("~~\n")
-    for root, _, files in os.walk(group_path):
-        for file in files:
-            if file.endswith('.csv'):
-                csv_path = os.path.join(root, file)
-                df = pd.read_csv(csv_path)
-                n, x = np.histogram(df['A3'].dropna(), bins=500)
-                bin_centers = 0.5*(x[1:]+x[:-1])
-                plt.plot(bin_centers,n)
+    print("~~")
 
+    for i in range(df['Class'].value_counts()[group_name]):
+        hist = list(map(float, df[df['Class'].isin([group_name])].iloc[i]['A3'].replace('[', '').replace(']', '').split(', ')))
+        bins = np.array(list(map(float, list(filter(('').__ne__, re.sub(r'\s+', ' ', df[df['Class'].isin([group_name])].iloc[i]['Bins A3'].replace('[', '').replace(']', '').replace('\n', ' ')).split(' '))))))
+        bin_centers = 0.5*(bins[1:]+bins[:-1])
+        plt.plot(bin_centers,hist)
     plt.title("A3: angle between 3 random vertices")
     plt.xlabel("")
     plt.ylabel("")
@@ -104,16 +138,12 @@ def get_group_properties(group_path: str) -> None:
 
     #D1
     print("D1: distance between barycenter and random vertex")
-    print("~~\n")
-    for root, _, files in os.walk(group_path):
-        for file in files:
-            if file.endswith('.csv'):
-                csv_path = os.path.join(root, file)
-                df = pd.read_csv(csv_path)
-                n, x = np.histogram(df['D1'].dropna(), bins=200)
-                bin_centers = 0.5*(x[1:]+x[:-1])
-                plt.plot(bin_centers,n)
-
+    print("~~")
+    for i in range(df['Class'].value_counts()[group_name]):
+        hist = list(map(float, df[df['Class'].isin([group_name])].iloc[i]['D1'].replace('[', '').replace(']', '').split(', ')))
+        bins = np.array(list(map(float, list(filter(('').__ne__, re.sub(r'\s+', ' ', df[df['Class'].isin([group_name])].iloc[i]['Bins D1'].replace('[', '').replace(']', '').replace('\n', ' ')).split(' '))))))
+        bin_centers = 0.5*(bins[1:]+bins[:-1])
+        plt.plot(bin_centers,hist)
     plt.title("D1: distance between barycenter and random vertex")
     plt.xlabel("")
     plt.ylabel("")
@@ -121,16 +151,12 @@ def get_group_properties(group_path: str) -> None:
 
     #D2
     print("D2: distance between 2 random vertices")
-    print("~~\n")
-    for root, _, files in os.walk(group_path):
-        for file in files:
-            if file.endswith('.csv'):
-                csv_path = os.path.join(root, file)
-                df = pd.read_csv(csv_path)
-                n, x = np.histogram(df['D2'].dropna(), bins=500)
-                bin_centers = 0.5*(x[1:]+x[:-1])
-                plt.plot(bin_centers,n)
-
+    print("~~")
+    for i in range(df['Class'].value_counts()[group_name]):
+        hist = list(map(float, df[df['Class'].isin([group_name])].iloc[i]['D2'].replace('[', '').replace(']', '').split(', ')))
+        bins = np.array(list(map(float, list(filter(('').__ne__, re.sub(r'\s+', ' ', df[df['Class'].isin([group_name])].iloc[i]['Bins D2'].replace('[', '').replace(']', '').replace('\n', ' ')).split(' '))))))
+        bin_centers = 0.5*(bins[1:]+bins[:-1])
+        plt.plot(bin_centers,hist)
     plt.title("D2: distance between 2 random vertices")
     plt.xlabel("")
     plt.ylabel("")
@@ -138,16 +164,12 @@ def get_group_properties(group_path: str) -> None:
 
     #D3
     print("D3: square root of area of triangle given by 3 random vertices")
-    print("~~\n")
-    for root, _, files in os.walk(group_path):
-        for file in files:
-            if file.endswith('.csv'):
-                csv_path = os.path.join(root, file)
-                df = pd.read_csv(csv_path)
-                n, x = np.histogram(df['D3'].dropna(), bins=500)
-                bin_centers = 0.5*(x[1:]+x[:-1])
-                plt.plot(bin_centers,n)
-
+    print("~~")
+    for i in range(df['Class'].value_counts()[group_name]):
+        hist = list(map(float, df[df['Class'].isin([group_name])].iloc[i]['D3'].replace('[', '').replace(']', '').split(', ')))
+        bins = np.array(list(map(float, list(filter(('').__ne__, re.sub(r'\s+', ' ', df[df['Class'].isin([group_name])].iloc[i]['Bins D3'].replace('[', '').replace(']', '').replace('\n', ' ')).split(' '))))))
+        bin_centers = 0.5*(bins[1:]+bins[:-1])
+        plt.plot(bin_centers,hist)
     plt.title("D3: square root of area of triangle given by 3 random vertices")
     plt.xlabel("")
     plt.ylabel("")
@@ -155,16 +177,12 @@ def get_group_properties(group_path: str) -> None:
 
     #D4
     print("D4: cube root of volume of tetrahedron formed by 4 random vertices")
-    print("~~\n")
-    for root, _, files in os.walk(group_path):
-        for file in files:
-            if file.endswith('.csv'):
-                csv_path = os.path.join(root, file)
-                df = pd.read_csv(csv_path)
-                n, x = np.histogram(df['D4'].dropna(), bins=500)
-                bin_centers = 0.5*(x[1:]+x[:-1])
-                plt.plot(bin_centers,n)
-
+    print("~~")
+    for i in range(df['Class'].value_counts()[group_name]):
+        hist = list(map(float, df[df['Class'].isin([group_name])].iloc[i]['D4'].replace('[', '').replace(']', '').split(', ')))
+        bins = np.array(list(map(float, list(filter(('').__ne__, re.sub(r'\s+', ' ', df[df['Class'].isin([group_name])].iloc[i]['Bins D4'].replace('[', '').replace(']', '').replace('\n', ' ')).split(' '))))))
+        bin_centers = 0.5*(bins[1:]+bins[:-1])
+        plt.plot(bin_centers,hist)
     plt.title("D4: cube root of volume of tetrahedron formed by 4 random vertices")
     plt.xlabel("")
     plt.ylabel("")
