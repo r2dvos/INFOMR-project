@@ -8,8 +8,9 @@ import trimesh
 import tkinter as tk
 from tkinter import filedialog
 import pandas as pd
+import numpy as np
 
-from normalization import compute_eigenvectors
+from normalization import compute_eigenvectors, compute_barycenter
 
 class Features(IntEnum):
     SurfaceArea = 0
@@ -23,7 +24,15 @@ def compute_features(mesh: trimesh.Trimesh, path: str) -> list[float]:
     features = []
     
     area = mesh.area
-    volume = mesh.volume
+    volume = 0.0
+    barycenter = compute_barycenter(mesh.faces, mesh.vertices, mesh.triangles_center)
+    for face in mesh.faces:
+        x1, x2, x3 = mesh.vertices[face]
+        v1 = x1 - barycenter
+        v2 = x2 - barycenter
+        v3 = x3 - barycenter
+        volume += np.dot(np.cross(v1, v2), v3)
+    volume = abs(volume) / 6.0
 
     # Surface Area
     features.append(float(area))
