@@ -11,7 +11,7 @@ import numpy as np
 from shape_property_descriptors import A3, D1, D2, D3, D4
 from features import compute_features
 
-ANALYSIS_VALUES_1: int = 4000
+ANALYSIS_VALUES_1: int = 0
 ANALYSIS_VALUES_2: int = 20000
 ANALYSIS_VALUES_3: int = 100000
 ANALYSIS_VALUES_4: int = 100000
@@ -44,6 +44,7 @@ def write_properties(db_path: str, output_path: str, big_db_name: str) -> None:
                 random_array_A3_1 = np.random.choice(range(len(shape.vertices)), ANALYSIS_VALUES_3, replace=True)
                 random_array_A3_2 = np.random.choice(range(len(shape.vertices)), ANALYSIS_VALUES_3, replace=True)
                 data_D1 = []
+                ANALYSIS_VALUES_1 = len(shape.vertices)
                 random_array_D1_0 = np.random.choice(range(len(shape.vertices)), ANALYSIS_VALUES_1, replace=False)
                 data_D2 = []
                 random_array_D2_0 = np.random.choice(range(len(shape.vertices)), ANALYSIS_VALUES_2, replace=True)
@@ -107,7 +108,6 @@ def write_properties(db_path: str, output_path: str, big_db_name: str) -> None:
                                  D2 = data_D2,
                                  D3 = data_D3,
                                  D4 = data_D4)
-
                 """
                 bin_centers = 0.5*(bins_A3[1:]+bins_A3[:-1])
                 plt.plot(bin_centers,new_hist_A3)
@@ -146,7 +146,6 @@ def write_properties(db_path: str, output_path: str, big_db_name: str) -> None:
 
                 print(wololo)
                 """
-
                 Path(output_path + "/" + shape_class).mkdir(parents=True, exist_ok=True)
                 df = pd.DataFrame(dict([(c, pd.Series(v)) for c, v in data_dict.items()]))
                 output_csv = file.replace(".obj", ".csv")
