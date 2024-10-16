@@ -12,7 +12,7 @@ from shape_property_descriptors import A3, D1, D2, D3, D4
 from features import compute_features
 
 ANALYSIS_VALUES_1: int = 0
-ANALYSIS_VALUES_2: int = 20000
+ANALYSIS_VALUES_2: int = 100000
 ANALYSIS_VALUES_3: int = 100000
 ANALYSIS_VALUES_4: int = 100000
 
