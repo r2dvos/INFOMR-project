@@ -36,11 +36,11 @@ def earth_movers_distance(dirt: np.ndarray, holes: np.ndarray) -> float:
     return tot_work
 
 def distance_between_features(features1: pd.Series, features2: pd.Series) -> float:
-    A3_dist = earth_movers_distance(np.fromstring(features1['A3'][1:-1], sep=' '), np.fromstring(features2['A3'][1:-1], sep=' '))
-    D1_dist = earth_movers_distance(np.fromstring(features1['D1'][1:-1], sep=' '), np.fromstring(features2['D1'][1:-1], sep=' '))
-    D2_dist = earth_movers_distance(np.fromstring(features1['D2'][1:-1], sep=' '), np.fromstring(features2['D2'][1:-1], sep=' '))
-    D3_dist = earth_movers_distance(np.fromstring(features1['D3'][1:-1], sep=' '), np.fromstring(features2['D3'][1:-1], sep=' '))
-    D4_dist = earth_movers_distance(np.fromstring(features1['D4'][1:-1], sep=' '), np.fromstring(features2['D4'][1:-1], sep=' '))
+    A3_dist = earth_movers_distance(np.fromstring(features1['A3'][1:-1], sep=', '), np.fromstring(features2['A3'][1:-1], sep=', '))
+    D1_dist = earth_movers_distance(np.fromstring(features1['D1'][1:-1], sep=', '), np.fromstring(features2['D1'][1:-1], sep=', '))
+    D2_dist = earth_movers_distance(np.fromstring(features1['D2'][1:-1], sep=', '), np.fromstring(features2['D2'][1:-1], sep=', '))
+    D3_dist = earth_movers_distance(np.fromstring(features1['D3'][1:-1], sep=', '), np.fromstring(features2['D3'][1:-1], sep=', '))
+    D4_dist = earth_movers_distance(np.fromstring(features1['D4'][1:-1], sep=', '), np.fromstring(features2['D4'][1:-1], sep=', '))
     area_dist = features1['Area'] - features2['Area']
     compactness_dist = features1['Compactness'] - features2['Compactness']
     regularity_dist = features1['Regularity'] - features2['Regularity']
@@ -58,5 +58,11 @@ if __name__ == "__main__":
     df = pd.read_csv("database.csv")
     print(df.columns)
     my_obj = df.iloc[0]
+    distances = []
     for i in range(1, len(df)):
-        print(distance_between_features(my_obj, df.iloc[i]))
+        entry = (df.iloc[i]['Class'], df.iloc[i]['File'], distance_between_features(my_obj, df.iloc[i]))
+        distances.append(entry)
+    distances = np.array(distances, dtype=[('Class', 'U20'), ('File', 'U10'), ('Distance', float)])
+    distances = np.sort(distances, order='Distance')
+    for i in range(10):
+        print(distances[i])
