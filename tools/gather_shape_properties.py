@@ -92,15 +92,15 @@ def write_properties(db_path: str, output_path: str, big_db_name: str) -> None:
                 # Part 3: bin normalization
                 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                 new_hist_A3 = []
-                new_hist_A3[:] = [float(h) / 50.0 for h in hist_A3]
+                new_hist_A3[:] = [float(h) / float(ANALYSIS_VALUES_3) for h in hist_A3]
                 new_hist_D1 = []
-                new_hist_D1[:] = [float(h) / 30.0 for h in hist_D1]
+                new_hist_D1[:] = [float(h) / float(ANALYSIS_VALUES_1) for h in hist_D1]
                 new_hist_D2 = []
-                new_hist_D2[:] = [float(h) / 50.0 for h in hist_D2]
+                new_hist_D2[:] = [float(h) / float(ANALYSIS_VALUES_2) for h in hist_D2]
                 new_hist_D3 = []
-                new_hist_D3[:] = [float(h) / 50.0 for h in hist_D3]
+                new_hist_D3[:] = [float(h) / float(ANALYSIS_VALUES_3) for h in hist_D3]
                 new_hist_D4 = []
-                new_hist_D4[:] = [float(h) / 50.0 for h in hist_D4]
+                new_hist_D4[:] = [float(h) / float(ANALYSIS_VALUES_4) for h in hist_D4]
                 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
                 data_dict = dict(A3 = data_A3,
@@ -152,8 +152,10 @@ def write_properties(db_path: str, output_path: str, big_db_name: str) -> None:
                 df.to_csv(output_path + "/" + shape_class + "/" + output_csv, index=False)
 
                 big_database.append((shape_class, file, area, compactness, regularity, diameter, convexity, eccencitry, new_hist_A3, bins_A3, new_hist_D1, bins_D1, new_hist_D2, bins_D2, new_hist_D3, bins_D3, new_hist_D4, bins_D4))
+                #big_database.append((shape_class, file, new_hist_A3, bins_A3, new_hist_D1, bins_D1, new_hist_D2, bins_D2, new_hist_D3, bins_D3, new_hist_D4, bins_D4))
                 
     big_df = pd.DataFrame(big_database, columns=["Class", "File", "Area", "Compactness", "Regularity", "Diameter", "Convexity", "Eccentricity", "A3", "Bins A3", "D1", "Bins D1", "D2", "Bins D2", "D3", "Bins D3", "D4", "Bins D4"])
+    #big_df = pd.DataFrame(big_database, columns=["Class", "File", "A3", "Bins A3", "D1", "Bins D1", "D2", "Bins D2", "D3", "Bins D3", "D4", "Bins D4"])
     big_df.to_csv(output_path + "/" + big_db_name, index=False)
 
 #
