@@ -42,14 +42,14 @@ def get_shape_properties(input_csv: str, obj_name: str) -> None:
 
     # Convexity
     surface_area = df[df['File'].isin([obj_name])].iloc[0]['Convexity']
-    print("SConvexity: " + str(surface_area))
+    print("Convexity: " + str(surface_area))
     print("~~")
 
     # Eccentricity
     surface_area = df[df['File'].isin([obj_name])].iloc[0]['Eccentricity']
     print("Eccentricity: " + str(surface_area))
     print("~~")
-
+    """
     #A3
     print("A3: angle between 3 random vertices")
     print("~~")
@@ -114,7 +114,7 @@ def get_shape_properties(input_csv: str, obj_name: str) -> None:
     plt.xlabel("")
     plt.ylabel("")
     plt.show()
-
+    """
 #
 #~~~~~~~~~
 #
@@ -131,7 +131,8 @@ def get_group_properties(input_csv: str, group_name: str) -> None:
         bins = np.array(list(map(float, list(filter(('').__ne__, re.sub(r'\s+', ' ', df[df['Class'].isin([group_name])].iloc[i]['Bins A3'].replace('[', '').replace(']', '').replace('\n', ' ')).split(' '))))))
         bin_centers = 0.5*(bins[1:]+bins[:-1])
         plt.plot(bin_centers,hist)
-    plt.title("A3: angle between 3 random vertices")
+    plt.title(group_name + "\nA3: angle between 3 random vertices")
+    plt.ylim(0.0, 1.0)
     plt.xlabel("")
     plt.ylabel("")
     plt.show()
@@ -144,7 +145,8 @@ def get_group_properties(input_csv: str, group_name: str) -> None:
         bins = np.array(list(map(float, list(filter(('').__ne__, re.sub(r'\s+', ' ', df[df['Class'].isin([group_name])].iloc[i]['Bins D1'].replace('[', '').replace(']', '').replace('\n', ' ')).split(' '))))))
         bin_centers = 0.5*(bins[1:]+bins[:-1])
         plt.plot(bin_centers,hist)
-    plt.title("D1: distance between barycenter and random vertex")
+    plt.title(group_name + "\nD1: distance between barycenter and random vertex")
+    plt.ylim(0.0, 1.0)
     plt.xlabel("")
     plt.ylabel("")
     plt.show()
@@ -157,7 +159,8 @@ def get_group_properties(input_csv: str, group_name: str) -> None:
         bins = np.array(list(map(float, list(filter(('').__ne__, re.sub(r'\s+', ' ', df[df['Class'].isin([group_name])].iloc[i]['Bins D2'].replace('[', '').replace(']', '').replace('\n', ' ')).split(' '))))))
         bin_centers = 0.5*(bins[1:]+bins[:-1])
         plt.plot(bin_centers,hist)
-    plt.title("D2: distance between 2 random vertices")
+    plt.title(group_name + "\nD2: distance between 2 random vertices")
+    plt.ylim(0.0, 1.0)
     plt.xlabel("")
     plt.ylabel("")
     plt.show()
@@ -170,7 +173,8 @@ def get_group_properties(input_csv: str, group_name: str) -> None:
         bins = np.array(list(map(float, list(filter(('').__ne__, re.sub(r'\s+', ' ', df[df['Class'].isin([group_name])].iloc[i]['Bins D3'].replace('[', '').replace(']', '').replace('\n', ' ')).split(' '))))))
         bin_centers = 0.5*(bins[1:]+bins[:-1])
         plt.plot(bin_centers,hist)
-    plt.title("D3: square root of area of triangle given by 3 random vertices")
+    plt.title(group_name + "\nD3: square root of area of triangle given by 3 random vertices")
+    plt.ylim(0.0, 1.0)
     plt.xlabel("")
     plt.ylabel("")
     plt.show()
@@ -183,7 +187,8 @@ def get_group_properties(input_csv: str, group_name: str) -> None:
         bins = np.array(list(map(float, list(filter(('').__ne__, re.sub(r'\s+', ' ', df[df['Class'].isin([group_name])].iloc[i]['Bins D4'].replace('[', '').replace(']', '').replace('\n', ' ')).split(' '))))))
         bin_centers = 0.5*(bins[1:]+bins[:-1])
         plt.plot(bin_centers,hist)
-    plt.title("D4: cube root of volume of tetrahedron formed by 4 random vertices")
+    plt.title(group_name + "\nD4: cube root of volume of tetrahedron formed by 4 random vertices")
+    plt.ylim(0.0, 1.0)
     plt.xlabel("")
     plt.ylabel("")
     plt.show()
