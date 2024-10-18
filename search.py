@@ -50,19 +50,49 @@ def distance_between_features(features1: pd.Series, features2: pd.Series) -> flo
     distance = np.linalg.norm([A3_dist, D1_dist, D2_dist, D3_dist, D4_dist, area_dist, compactness_dist, regularity_dist, diameter_dist, convexity_dist, eccencitry_dist])   
     return distance
 
+def distance_between_features2(features1: pd.Series, features2: pd.Series) -> float:
+    features1_array = np.array([
+        features1['Area'],
+        features1['Compactness'],
+        features1['Regularity'],
+        features1['Diameter'],
+        features1['Convexity'],
+        features1['Eccentricity'],
+        *np.fromstring(features1['A3'][1:-1], sep=', '),
+        *np.fromstring(features1['D1'][1:-1], sep=', '),
+        *np.fromstring(features1['D2'][1:-1], sep=', '),
+        *np.fromstring(features1['D3'][1:-1], sep=', '),
+        *np.fromstring(features1['D4'][1:-1], sep=', ')
+        ])
+    features2_array = np.array([
+        features2['Area'],
+        features2['Compactness'],
+        features2['Regularity'],
+        features2['Diameter'],
+        features2['Convexity'],
+        features2['Eccentricity'],
+        *np.fromstring(features2['A3'][1:-1], sep=', '),
+        *np.fromstring(features2['D1'][1:-1], sep=', '),
+        *np.fromstring(features2['D2'][1:-1], sep=', '),
+        *np.fromstring(features2['D3'][1:-1], sep=', '),
+        *np.fromstring(features2['D4'][1:-1], sep=', ')
+        ])
+    distance = earth_movers_distance(features1_array, features2_array)
+    return distance
+
 if __name__ == "__main__":
     #root = tk.Tk()
     #root.withdraw()
 
     #objFile = tk.filedialog.askopenfilename(initialdir = "../../ShapeDatabase_INFOMR_copy")
     df = pd.read_csv("database.csv")
-    print(df.columns)
     my_obj = df.iloc[0]
     distances = []
     for i in range(1, len(df)):
-        entry = (df.iloc[i]['Class'], df.iloc[i]['File'], distance_between_features(my_obj, df.iloc[i]))
+        entry = (df.iloc[i]['Class'], df.iloc[i]['File'], distance_between_features2(my_obj, df.iloc[i]))
         distances.append(entry)
     distances = np.array(distances, dtype=[('Class', 'U20'), ('File', 'U10'), ('Distance', float)])
     distances = np.sort(distances, order='Distance')
-    for i in range(10):
-        print(distances[i])
+    for i in range(len(distances)):
+        if (distances[i]['Class'] == my_obj['Class']):
+            print(distances[i])
