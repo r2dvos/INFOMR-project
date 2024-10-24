@@ -1,6 +1,9 @@
 import numpy as np
 import tkinter as tk
 import pandas as pd
+import trimesh
+from gather_shape_properties import shape_properties
+from normalization import normalize_shape
 
 def first_nonzero(dirt_or_holes: np.ndarray) -> int:
     dim = dirt_or_holes.size
@@ -36,11 +39,11 @@ def earth_movers_distance(dirt: np.ndarray, holes: np.ndarray) -> float:
     return tot_work
 
 def distance_between_features(features1: pd.Series, features2: pd.Series) -> float:
-    A3_dist = earth_movers_distance(np.fromstring(features1['A3'][1:-1], sep=', '), np.fromstring(features2['A3'][1:-1], sep=', '))
-    D1_dist = earth_movers_distance(np.fromstring(features1['D1'][1:-1], sep=', '), np.fromstring(features2['D1'][1:-1], sep=', '))
-    D2_dist = earth_movers_distance(np.fromstring(features1['D2'][1:-1], sep=', '), np.fromstring(features2['D2'][1:-1], sep=', '))
-    D3_dist = earth_movers_distance(np.fromstring(features1['D3'][1:-1], sep=', '), np.fromstring(features2['D3'][1:-1], sep=', '))
-    D4_dist = earth_movers_distance(np.fromstring(features1['D4'][1:-1], sep=', '), np.fromstring(features2['D4'][1:-1], sep=', '))
+    A3_dist = earth_movers_distance(features1['A3'], features2['A3'])
+    D1_dist = earth_movers_distance(features1['D1'], features2['D1'])
+    D2_dist = earth_movers_distance(features1['D2'], features2['D2'])
+    D3_dist = earth_movers_distance(features1['D3'], features2['D3'])
+    D4_dist = earth_movers_distance(features1['D4'], features2['D4'])
     area_dist = features1['Area'] - features2['Area']
     compactness_dist = features1['Compactness'] - features2['Compactness']
     regularity_dist = features1['Regularity'] - features2['Regularity']
@@ -81,18 +84,35 @@ def distance_between_features2(features1: pd.Series, features2: pd.Series) -> fl
     return distance
 
 if __name__ == "__main__":
-    #root = tk.Tk()
-    #root.withdraw()
+    root = tk.Tk()
+    root.withdraw()
 
-    #objFile = tk.filedialog.askopenfilename(initialdir = "../../ShapeDatabase_INFOMR_copy")
+    path = tk.filedialog.askopenfilename(initialdir = "../../ShapeDatabase_INFOMR_copy")
+    obj = trimesh.load_mesh(path)
+    obj = normalize_shape(obj)
+    properties = shape_properties(obj, path)[0]
+    properties_list = list(properties)
+    properties_list.insert(0, "padding")
+    properties_list.insert(0, "padding")
+    properties = tuple(properties_list)
     df = pd.read_csv("database.csv")
-    my_obj = df.iloc[0]
+    column_headers = df.columns
+    my_obj = pd.Series(properties, index=column_headers)
     distances = []
-    for i in range(1, len(df)):
-        entry = (df.iloc[i]['Class'], df.iloc[i]['File'], distance_between_features2(my_obj, df.iloc[i]))
+
+    for i in range(0, len(df)):
+        df.at[i, 'A3'] = np.fromstring(df.at[i, 'A3'][1:-1], sep=', ')
+        df.at[i, 'D1'] = np.fromstring(df.at[i, 'D1'][1:-1], sep=', ')
+        df.at[i, 'D2'] = np.fromstring(df.at[i, 'D2'][1:-1], sep=', ')
+        df.at[i, 'D3'] = np.fromstring(df.at[i, 'D3'][1:-1], sep=', ')
+        df.at[i, 'D4'] = np.fromstring(df.at[i, 'D4'][1:-1], sep=', ')
+
+    for i in range(0, len(df)):
+        entry = (df.iloc[i]['Class'], df.iloc[i]['File'], distance_between_features(my_obj, df.iloc[i]))
         distances.append(entry)
+        print(f"Tested {i}")
     distances = np.array(distances, dtype=[('Class', 'U20'), ('File', 'U10'), ('Distance', float)])
     distances = np.sort(distances, order='Distance')
-    for i in range(len(distances)):
-        if (distances[i]['Class'] == my_obj['Class']):
-            print(distances[i])
+    print("Sorting...")
+    for i in range(20):
+        print(distances[i])
