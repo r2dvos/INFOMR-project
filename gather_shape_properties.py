@@ -114,8 +114,12 @@ def write_properties(db_path: str, output_path: str, big_db_name: str) -> None:
                 df = pd.DataFrame(dict([(c, pd.Series(v)) for c, v in properties[1].items()]))
                 output_csv = file.replace(".obj", ".csv")
                 df.to_csv(output_path + "/" + shape_class + "/" + output_csv, index=False)
-                          
-                big_database.append((shape_class, file).append(properties[0]))
+
+                properties_list = list(properties[0])
+                properties_list.insert(0, file)
+                properties_list.insert(0, shape_class)
+                p = tuple(properties_list)
+                big_database.append(p)
                 
     big_df = pd.DataFrame(big_database, columns=["Class", "File", "Area", "Compactness", "Regularity", "Diameter", "Convexity", "Eccentricity", "A3", "Bins A3", "D1", "Bins D1", "D2", "Bins D2", "D3", "Bins D3", "D4", "Bins D4"])
     big_df["Area"] = (big_df["Area"] - big_df["Area"].min()) / (big_df["Area"].max() - big_df["Area"].min())

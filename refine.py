@@ -7,6 +7,7 @@ import tkinter as tk
 import trimesh
 import vedo
 import vedo.mesh
+import shutil
 
 TARGET: int = 5000
 TARGET_RANGE: int = 1000
@@ -132,6 +133,13 @@ def refine_pass(function, path: str, passes: int, lower: int, upper: int) -> Non
         for error in errors:
             print(error)
 
+def full_refine(path: str, passes: int, keep_input = False) -> None:
+    if keep_input:
+        shutil.copy(path, path + ".bak")
+    refine_pass(refine_mesh, path, passes, TARGET - TARGET_RANGE, TARGET + TARGET_RANGE)
+    refine_pass(final_decimate, path, passes, TARGET - TARGET_RANGE, TARGET + TARGET_RANGE)
+    refine_pass(final_decimate_fallback, path, passes, TARGET - TARGET_RANGE, TARGET + TARGET_RANGE)
+
 if __name__ == "__main__":
     help = "Usage:\n-f: Refine a single file. Arg: passes\n-a: Refine all files in a directory. Args: passes, dir path\n-h: Display this help message"
     if len(sys.argv) > 1:
@@ -146,12 +154,10 @@ if __name__ == "__main__":
 
         objFile = filedialog.askopenfilename(initialdir = "../../ShapeDatabase_INFOMR_copy")
         passes = int(sys.argv[2])
-        refine_mesh(objFile, passes, TARGET - TARGET_RANGE, TARGET + TARGET_RANGE)
+        full_refine(objFile, passes)
     elif mode == "-a" and len(sys.argv) > 3:
         passes = int(sys.argv[2])
         path = sys.argv[3]
-        refine_pass(refine_mesh, path, passes, TARGET - TARGET_RANGE, TARGET + TARGET_RANGE)
-        refine_pass(final_decimate, path, passes, TARGET - TARGET_RANGE, TARGET + TARGET_RANGE)
-        refine_pass(final_decimate_fallback, path, passes, TARGET - TARGET_RANGE, TARGET + TARGET_RANGE)
+        full_refine(path, passes)
     else:
         print(help)

@@ -2,8 +2,10 @@ import numpy as np
 import tkinter as tk
 import pandas as pd
 import trimesh
+import os
 from gather_shape_properties import shape_properties
 from normalization import normalize_shape
+from refine import full_refine
 
 def first_nonzero(dirt_or_holes: np.ndarray) -> int:
     dim = dirt_or_holes.size
@@ -88,6 +90,7 @@ if __name__ == "__main__":
     root.withdraw()
 
     path = tk.filedialog.askopenfilename(initialdir = "../../ShapeDatabase_INFOMR_copy")
+    full_refine(path, 1, True)
     obj = trimesh.load_mesh(path)
     obj = normalize_shape(obj)
     properties = shape_properties(obj, path)[0]
@@ -116,3 +119,7 @@ if __name__ == "__main__":
     print("Sorting...")
     for i in range(20):
         print(distances[i])
+
+    os.rename(path + '.bak', path + '.temp')
+    os.rename(path, path + '.bak')
+    os.rename(path + '.temp', path)
