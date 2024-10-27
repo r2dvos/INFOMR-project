@@ -96,11 +96,14 @@ def refine_pass(function, path: str, passes: int, lower: int, upper: int) -> Non
     max_duration = 60
     errors = []
     tasks = []
-    for root, _, files in os.walk(path):
-        for file in files:
-            if file.endswith('.obj'):
-                full_path = os.path.join(root, file)
-                tasks.append((full_path, passes, lower, upper))
+    if os.path.isfile(path):
+        tasks.append((path, passes, lower, upper))
+    else:
+        for root, _, files in os.walk(path):
+            for file in files:
+                if file.endswith('.obj'):
+                    full_path = os.path.join(root, file)
+                    tasks.append((full_path, passes, lower, upper))
 
     active_processes = []
 

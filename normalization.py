@@ -82,7 +82,7 @@ def normalize_shape(shape: trimesh.Trimesh) -> trimesh.Trimesh:
 
     # Scale normalization
     max_bound = compute_scaling(shape.bounds)
-    matrix = np.matrix([[1/max_bound, 0, 0, 0], [0, 1/max_bound, 0, 0], [0, 0, 1/max_bound, 0], [0, 0, 0, 1]])
+    matrix = np.array([[1/max_bound, 0, 0, 0], [0, 1/max_bound, 0, 0], [0, 0, 1/max_bound, 0], [0, 0, 0, 1]])
     shape.apply_transform(matrix)
 
     return shape

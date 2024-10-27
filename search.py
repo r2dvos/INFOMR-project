@@ -120,6 +120,5 @@ if __name__ == "__main__":
     for i in range(20):
         print(distances[i])
 
-    os.rename(path + '.bak', path + '.temp')
-    os.rename(path, path + '.bak')
-    os.rename(path + '.temp', path)
+    os.remove(path)
+    os.rename(path + '.bak', path)
