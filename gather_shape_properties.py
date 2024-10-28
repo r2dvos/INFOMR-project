@@ -122,6 +122,12 @@ def write_properties(db_path: str, output_path: str, big_db_name: str) -> None:
                 big_database.append(p)
                 
     big_df = pd.DataFrame(big_database, columns=["Class", "File", "Area", "Compactness", "Regularity", "Diameter", "Convexity", "Eccentricity", "A3", "Bins A3", "D1", "Bins D1", "D2", "Bins D2", "D3", "Bins D3", "D4", "Bins D4"])
+    print(f"Area mean: {big_df['Area'].mean()} std: {big_df['Area'].std()}")
+    print(f"Compactness mean: {big_df['Compactness'].mean()} std: {big_df['Compactness'].std()}")
+    print(f"Regularity mean: {big_df['Regularity'].mean()} std: {big_df['Regularity'].std()}")
+    print(f"Diameter mean: {big_df['Diameter'].mean()} std: {big_df['Diameter'].std()}")
+    print(f"Convexity mean: {big_df['Convexity'].mean()} std: {big_df['Convexity'].std()}")
+    print(f"Eccentricity mean: {big_df['Eccentricity'].mean()} std: {big_df['Eccentricity'].std()}")
     big_df["Area"] = (big_df["Area"] - big_df["Area"].mean()) / big_df["Area"].std()
     big_df["Compactness"] = (big_df["Compactness"] - big_df["Compactness"].mean()) / big_df["Compactness"].std()
     big_df["Regularity"] = (big_df["Regularity"] - big_df["Regularity"].mean()) / big_df["Regularity"].std()
