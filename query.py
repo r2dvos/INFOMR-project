@@ -62,7 +62,8 @@ def distance_between_features(features1: pd.Series, features2: pd.Series) -> flo
     diameter_dist = features1['Diameter'] - features2['Diameter']
     convexity_dist = features1['Convexity'] - features2['Convexity']
     eccencitry_dist = features1['Eccentricity'] - features2['Eccentricity']
-    distance = np.linalg.norm([A3_dist, D1_dist, D2_dist, D3_dist, D4_dist, area_dist, compactness_dist, regularity_dist, diameter_dist, convexity_dist, eccencitry_dist])   
+    #distance = np.linalg.norm([A3_dist, D1_dist, D2_dist, D3_dist, D4_dist, area_dist, compactness_dist, regularity_dist, diameter_dist, convexity_dist, eccencitry_dist]) 
+    distance = A3_dist + D1_dist + D2_dist + D3_dist + D4_dist + area_dist + compactness_dist + regularity_dist + diameter_dist + convexity_dist + eccencitry_dist  
     return distance
 
 def distance_between_features2(features1: pd.Series, features2: pd.Series) -> float:
@@ -247,3 +248,4 @@ if __name__ == "__main__":
 
     os.remove(path)
     os.rename(path + '.bak', path)
+
