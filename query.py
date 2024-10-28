@@ -62,8 +62,8 @@ def distance_between_features(features1: pd.Series, features2: pd.Series) -> flo
     diameter_dist = features1['Diameter'] - features2['Diameter']
     convexity_dist = features1['Convexity'] - features2['Convexity']
     eccencitry_dist = features1['Eccentricity'] - features2['Eccentricity']
-    #distance = np.linalg.norm([A3_dist, D1_dist, D2_dist, D3_dist, D4_dist, area_dist, compactness_dist, regularity_dist, diameter_dist, convexity_dist, eccencitry_dist]) 
-    distance = A3_dist + D1_dist + D2_dist + D3_dist + D4_dist + area_dist + compactness_dist + regularity_dist + diameter_dist + convexity_dist + eccencitry_dist  
+    distance = np.linalg.norm([A3_dist, D1_dist, D2_dist, D3_dist, D4_dist, area_dist, compactness_dist, regularity_dist, diameter_dist, convexity_dist, eccencitry_dist]) 
+    #distance = A3_dist + D1_dist + D2_dist + D3_dist + D4_dist + area_dist + compactness_dist + regularity_dist + diameter_dist + convexity_dist + eccencitry_dist  
     return distance
 
 def distance_between_features2(features1: pd.Series, features2: pd.Series) -> float:
@@ -97,12 +97,20 @@ def distance_between_features2(features1: pd.Series, features2: pd.Series) -> fl
     return distance
 
 def normalize_query(properties_list, df):
-    properties_list[0] = (properties_list[0] - df["Area"].mean()) / df["Area"].std()
-    properties_list[1] = (properties_list[1] - df["Compactness"].mean()) / df["Compactness"].std()
-    properties_list[2] = (properties_list[2] - df["Regularity"].mean()) / df["Regularity"].std()
-    properties_list[3] = (properties_list[3] - df["Diameter"].mean()) / df["Diameter"].std()
-    properties_list[4] = (properties_list[4] - df["Convexity"].mean()) / df["Convexity"].std()
-    properties_list[5] = (properties_list[5] - df["Eccentricity"].mean()) / df["Eccentricity"].std()
+    properties_list["Area"] = (properties_list["Area"] - df["Area"].mean()) / df["Area"].std()
+    properties_list["Compactness"] = (properties_list["Compactness"] - df["Compactness"].mean()) / df["Compactness"].std()
+    properties_list["Regularity"] = (properties_list["Regularity"] - df["Regularity"].mean()) / df["Regularity"].std()
+    properties_list["Diameter"] = (properties_list["Diameter"] - df["Diameter"].mean()) / df["Diameter"].std()
+    properties_list["Convexity"] = (properties_list["Convexity"] - df["Convexity"].mean()) / df["Convexity"].std()
+    properties_list["Eccentricity"] = (properties_list["Eccentricity"] - df["Eccentricity"].mean()) / df["Eccentricity"].std()
+    """
+    properties_list["Area"] = (properties_list["Area"] - df["Area"].min()) / (df["Area"].max() - df["Area"].min())
+    properties_list["Compactness"] = (properties_list["Compactness"] - df["Compactness"].min()) / (df["Compactness"].max() - df["Compactness"].min())
+    properties_list["Regularity"] = (properties_list["Regularity"] - df["Regularity"].min()) / (df["Regularity"].max() - df["Regularity"].min())
+    properties_list["Diameter"] = (properties_list["Diameter"] - df["Diameter"].min()) / (df["Diameter"].max() - df["Diameter"].min())
+    properties_list["Convexity"] = (properties_list["Convexity"] - df["Convexity"].min()) / (df["Convexity"].max() - df["Convexity"].min())
+    properties_list["Eccentricity"] = (properties_list["Eccentricity"] - df["Eccentricity"].min()) / (df["Eccentricity"].max() - df["Eccentricity"].min())
+    """
     return properties_list
 
 ###########################################################################################################################################################
@@ -217,19 +225,17 @@ if __name__ == "__main__":
     obj = trimesh.load_mesh(path)
     obj = normalize_shape(obj)
     df = pd.read_csv("database.csv")
+    df_no_norm = pd.read_csv("database_no_norm.csv")
 
     properties = shape_properties(obj, path)[0]
     properties_list = list(properties)
-    print(properties_list)
-    properties_list = normalize_query(properties_list, df)
-    print(properties_list)
-    """
     properties_list.insert(0, "padding")
     properties_list.insert(0, "padding")
     properties = tuple(properties_list)
     
     column_headers = df.columns
     my_obj = pd.Series(properties, index=column_headers)
+    my_obj = normalize_query(my_obj, df_no_norm)
     distances = []
 
     for i in range(0, len(df)):
@@ -259,7 +265,7 @@ if __name__ == "__main__":
         dists.append(distances[i][['Distance']].astype(float))
 
     result_printer(queryObj, returnObjs, queryInfo, returnInfos, dists)
-    """
+
     os.remove(path)
     os.rename(path + '.bak', path)
 
