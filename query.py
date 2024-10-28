@@ -62,9 +62,9 @@ def distance_between_features(features1: pd.Series, features2: pd.Series) -> flo
     diameter_dist = features1['Diameter'] - features2['Diameter']
     convexity_dist = features1['Convexity'] - features2['Convexity']
     eccencitry_dist = features1['Eccentricity'] - features2['Eccentricity']
-    #distance = np.linalg.norm([A3_dist, D1_dist, D2_dist, D3_dist, D4_dist, area_dist, compactness_dist, regularity_dist, diameter_dist, convexity_dist, eccencitry_dist]) 
-    distance = A3_dist + D1_dist + D2_dist + D3_dist + D4_dist + area_dist + compactness_dist + regularity_dist + diameter_dist + convexity_dist + eccencitry_dist  
-    return distance
+    distance = np.linalg.norm([A3_dist, D1_dist, D2_dist, D3_dist, D4_dist, area_dist, compactness_dist, regularity_dist, diameter_dist, convexity_dist, eccencitry_dist]) 
+    #distance = A3_dist + D1_dist + D2_dist + D3_dist + D4_dist + area_dist + compactness_dist + regularity_dist + diameter_dist + convexity_dist + eccencitry_dist  
+    return abs(distance)
 
 def distance_between_features2(features1: pd.Series, features2: pd.Series) -> float:
     features1_array = np.array([
@@ -220,10 +220,12 @@ if __name__ == "__main__":
 
     properties = shape_properties(obj, path)[0]
     properties_list = list(properties)
-    print(properties_list)
-    properties_list = normalize_query(properties_list, df)
-    print(properties_list)
-    """
+    properties_list[0] = (properties_list[0] - 2.06) / 2.64
+    properties_list[1] = (properties_list[1] - 167.34) / 6499.43
+    properties_list[2] = (properties_list[2] - 0.23) / 0.33
+    properties_list[3] = (properties_list[3] - 1.05) / 0.085
+    properties_list[4] = (properties_list[4] - 0.38) / 0.47
+    properties_list[5] = (properties_list[5] - 122.79) / 1333.32
     properties_list.insert(0, "padding")
     properties_list.insert(0, "padding")
     properties = tuple(properties_list)
@@ -259,7 +261,7 @@ if __name__ == "__main__":
         dists.append(distances[i][['Distance']].astype(float))
 
     result_printer(queryObj, returnObjs, queryInfo, returnInfos, dists)
-    """
+
     os.remove(path)
     os.rename(path + '.bak', path)
 
