@@ -96,6 +96,14 @@ def distance_between_features2(features1: pd.Series, features2: pd.Series) -> fl
     distance = earth_movers_distance(features1_array, features2_array)
     return distance
 
+def normalize_query(properties_list, df):
+    properties_list[0] = (properties_list[0] - df["Area"].mean()) / df["Area"].std()
+    properties_list[1] = (properties_list[1] - df["Compactness"].mean()) / df["Compactness"].std()
+    properties_list[2] = (properties_list[2] - df["Regularity"].mean()) / df["Regularity"].std()
+    properties_list[3] = (properties_list[3] - df["Diameter"].mean()) / df["Diameter"].std()
+    properties_list[4] = (properties_list[4] - df["Convexity"].mean()) / df["Convexity"].std()
+    properties_list[5] = (properties_list[5] - df["Eccentricity"].mean()) / df["Eccentricity"].std()
+    return properties_list
 
 ###########################################################################################################################################################
 
@@ -208,12 +216,18 @@ if __name__ == "__main__":
     full_refine(path, 1, True)
     obj = trimesh.load_mesh(path)
     obj = normalize_shape(obj)
+    df = pd.read_csv("database.csv")
+
     properties = shape_properties(obj, path)[0]
     properties_list = list(properties)
+    print(properties_list)
+    properties_list = normalize_query(properties_list, df)
+    print(properties_list)
+    """
     properties_list.insert(0, "padding")
     properties_list.insert(0, "padding")
     properties = tuple(properties_list)
-    df = pd.read_csv("database.csv")
+    
     column_headers = df.columns
     my_obj = pd.Series(properties, index=column_headers)
     distances = []
@@ -245,7 +259,7 @@ if __name__ == "__main__":
         dists.append(distances[i][['Distance']].astype(float))
 
     result_printer(queryObj, returnObjs, queryInfo, returnInfos, dists)
-
+    """
     os.remove(path)
     os.rename(path + '.bak', path)
 

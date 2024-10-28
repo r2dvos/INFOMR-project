@@ -122,12 +122,12 @@ def write_properties(db_path: str, output_path: str, big_db_name: str) -> None:
                 big_database.append(p)
                 
     big_df = pd.DataFrame(big_database, columns=["Class", "File", "Area", "Compactness", "Regularity", "Diameter", "Convexity", "Eccentricity", "A3", "Bins A3", "D1", "Bins D1", "D2", "Bins D2", "D3", "Bins D3", "D4", "Bins D4"])
-    big_df["Area"] = (big_df["Area"] - big_df["Area"].min()) / (big_df["Area"].max() - big_df["Area"].min())
-    big_df["Compactness"] = (big_df["Compactness"] - big_df["Compactness"].min()) / (big_df["Compactness"].max() - big_df["Compactness"].min())
-    big_df["Regularity"] = (big_df["Regularity"] - big_df["Regularity"].min()) / (big_df["Regularity"].max() - big_df["Regularity"].min())
-    big_df["Diameter"] = (big_df["Diameter"] - big_df["Diameter"].min()) / (big_df["Diameter"].max() - big_df["Diameter"].min())
-    big_df["Convexity"] = (big_df["Convexity"] - big_df["Convexity"].min()) / (big_df["Convexity"].max() - big_df["Convexity"].min()) 
-    big_df["Eccentricity"] = (big_df["Eccentricity"] - big_df["Eccentricity"].min()) / (big_df["Eccentricity"].max() - big_df["Eccentricity"].min())
+    big_df["Area"] = (big_df["Area"] - big_df["Area"].mean()) / big_df["Area"].std()
+    big_df["Compactness"] = (big_df["Compactness"] - big_df["Compactness"].mean()) / big_df["Compactness"].std()
+    big_df["Regularity"] = (big_df["Regularity"] - big_df["Regularity"].mean()) / big_df["Regularity"].std()
+    big_df["Diameter"] = (big_df["Diameter"] - big_df["Diameter"].mean()) / big_df["Diameter"].std()
+    big_df["Convexity"] = (big_df["Convexity"] - big_df["Convexity"].mean()) / big_df["Convexity"].std()
+    big_df["Eccentricity"] = (big_df["Eccentricity"] - big_df["Eccentricity"].mean()) / big_df["Eccentricity"].std()
     big_df.to_csv(output_path + "/" + big_db_name, index=False)
 
 #
