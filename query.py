@@ -51,53 +51,44 @@ def earth_movers_distance(dirt: np.ndarray, holes: np.ndarray) -> float:
     return tot_work
 
 def distance_between_features(features1: pd.Series, features2: pd.Series) -> float:
-    A3_dist = earth_movers_distance(features1['A3'], features2['A3'])
-    D1_dist = earth_movers_distance(features1['D1'], features2['D1'])
-    D2_dist = earth_movers_distance(features1['D2'], features2['D2'])
-    D3_dist = earth_movers_distance(features1['D3'], features2['D3'])
-    D4_dist = earth_movers_distance(features1['D4'], features2['D4'])
-    area_dist = features1['Area'] - features2['Area']
-    compactness_dist = features1['Compactness'] - features2['Compactness']
-    regularity_dist = features1['Regularity'] - features2['Regularity']
-    diameter_dist = features1['Diameter'] - features2['Diameter']
-    convexity_dist = features1['Convexity'] - features2['Convexity']
-    eccencitry_dist = features1['Eccentricity'] - features2['Eccentricity']
-    distance = np.linalg.norm([A3_dist, D1_dist, D2_dist, D3_dist, D4_dist, area_dist, compactness_dist, regularity_dist, diameter_dist, convexity_dist, eccencitry_dist]) 
-    #distance = A3_dist + D1_dist + D2_dist + D3_dist + D4_dist + area_dist + compactness_dist + regularity_dist + diameter_dist + convexity_dist + eccencitry_dist  
+    weight_A3 = 1
+    weight_D1 = 1
+    weight_D2 = 1
+    weight_D3 = 1
+    weight_D4 = 1
+    weight_area = 1
+    weight_comapctness = 1
+    weight_regularity = 1
+    weight_diameter = 1
+    weight_convexity = 1
+    weight_eccentricity = 1
+
+    A3_dist = earth_movers_distance(features1['A3'], features2['A3']) * weight_A3
+    D1_dist = earth_movers_distance(features1['D1'], features2['D1']) * weight_D1
+    D2_dist = earth_movers_distance(features1['D2'], features2['D2']) * weight_D2
+    D3_dist = earth_movers_distance(features1['D3'], features2['D3']) * weight_D3
+    D4_dist = earth_movers_distance(features1['D4'], features2['D4']) * weight_D4
+
+    area_dist = (features1['Area'] - features2['Area']) * weight_area
+    compactness_dist = (features1['Compactness'] - features2['Compactness']) * weight_comapctness
+    regularity_dist = (features1['Regularity'] - features2['Regularity']) * weight_regularity
+    diameter_dist = (features1['Diameter'] - features2['Diameter']) * weight_diameter
+    convexity_dist = (features1['Convexity'] - features2['Convexity']) * weight_convexity
+    eccencitry_dist = (features1['Eccentricity'] - features2['Eccentricity']) * weight_eccentricity
+
+    distance = np.linalg.norm([A3_dist, D1_dist, D2_dist, D3_dist, D4_dist, area_dist, compactness_dist, regularity_dist, diameter_dist, convexity_dist, eccencitry_dist])
     return abs(distance)
 
-
-def distance_between_features2(features1: pd.Series, features2: pd.Series) -> float:
-    features1_array = np.array([
-        features1['Area'],
-        features1['Compactness'],
-        features1['Regularity'],
-        features1['Diameter'],
-        features1['Convexity'],
-        features1['Eccentricity'],
-        *np.fromstring(features1['A3'][1:-1], sep=', '),
-        *np.fromstring(features1['D1'][1:-1], sep=', '),
-        *np.fromstring(features1['D2'][1:-1], sep=', '),
-        *np.fromstring(features1['D3'][1:-1], sep=', '),
-        *np.fromstring(features1['D4'][1:-1], sep=', ')
-        ])
-    features2_array = np.array([
-        features2['Area'],
-        features2['Compactness'],
-        features2['Regularity'],
-        features2['Diameter'],
-        features2['Convexity'],
-        features2['Eccentricity'],
-        *np.fromstring(features2['A3'][1:-1], sep=', '),
-        *np.fromstring(features2['D1'][1:-1], sep=', '),
-        *np.fromstring(features2['D2'][1:-1], sep=', '),
-        *np.fromstring(features2['D3'][1:-1], sep=', '),
-        *np.fromstring(features2['D4'][1:-1], sep=', ')
-        ])
-    distance = earth_movers_distance(features1_array, features2_array)
-    return distance
-
 def normalize_query(properties_list, df):
+
+    print(properties_list["Class"])
+    print(properties_list["File"])
+    print(properties_list["Area"])
+    print(df["Area"].mean())
+    print(df["Area"].std())
+    print((properties_list["Area"] - df["Area"].mean()) / df["Area"].std())
+    print(end)
+
     properties_list["Area"] = (properties_list["Area"] - df["Area"].mean()) / df["Area"].std()
     properties_list["Compactness"] = (properties_list["Compactness"] - df["Compactness"].mean()) / df["Compactness"].std()
     properties_list["Regularity"] = (properties_list["Regularity"] - df["Regularity"].mean()) / df["Regularity"].std()
