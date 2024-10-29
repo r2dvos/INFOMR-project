@@ -16,6 +16,8 @@ from gather_shape_properties import shape_properties
 from normalization import normalize_shape
 from refine import full_refine
 
+# from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+
 
 def first_nonzero(dirt_or_holes: np.ndarray) -> int:
     dim = dirt_or_holes.size
@@ -100,7 +102,7 @@ def normalize_query(properties_list, df):
 ###########################################################################################################################################################
 
 
-def result_printer(queryObj, returnObjs, queryInfo, returnInfos, dists): 
+def result_printer(queryObj, returnObjs, queryInfo, returnInfos, queryHist, returnHists, dists): 
     def btn_open(index):
         def clicked(event):
             mesh = vedo.Mesh(obj_shapes[index])
@@ -113,6 +115,39 @@ def result_printer(queryObj, returnObjs, queryInfo, returnInfos, dists):
             print("~~")
             print(obj_infos[index])
         return clicked
+
+    def btn_histograms(index):
+        def clicked(event):
+            """
+            #A3
+            hist = obj_hists[index]['A3']
+            if index == 0:
+                hist = np.array(hist)
+
+            bins = obj_hists[index]['Bins A3']
+            if index > 0:
+                bins = np.fromstring(bins.replace('[', '').replace(']', '').replace('\n', ' '), dtype=float, sep=' ')
+
+            bin_centers = 0.5*(bins[1:]+bins[:-1])
+
+            new_window = tk.Toplevel()
+            new_window.title("New Plot Window")
+
+            new_fig, new_ax = plt.subplots()
+            new_ax.plot(bin_centers, hist)
+            new_ax.set_title("A3: angle between 3 random vertices")
+            new_ax.set_xlabel("")
+            new_ax.set_ylabel("")
+
+            canvas = FigureCanvasTkAgg(new_fig, master=new_window)
+            canvas.draw()
+            canvas.get_tk_widget().pack(fill=tk.BOTH, expand=True)
+            """
+            print("~~")
+            print(obj_hists[index][['A3', 'D1', 'D2', 'D3', 'D4']])
+        return clicked
+
+    ####
 
     shutil.rmtree('./temp_images', ignore_errors=True)
     Path("./temp_images").mkdir(parents=True, exist_ok=True)
@@ -135,12 +170,15 @@ def result_printer(queryObj, returnObjs, queryInfo, returnInfos, dists):
 
     obj_shapes = []
     obj_infos = []
+    obj_hists = []
 
     obj_shapes.append(queryObj)
     obj_infos.append(queryInfo)
+    obj_hists.append(queryHist)
     for i in range(10):
         obj_shapes.append(returnObjs[i])
         obj_infos.append(returnInfos[i])
+        obj_hists.append(returnHists[i])
 
     # ~~
     nrows, ncols = 3, 5
@@ -156,6 +194,7 @@ def result_printer(queryObj, returnObjs, queryInfo, returnInfos, dists):
 
     btns_view = []
     btns_info = []
+    btns_hist = []
 
     for i, axi in enumerate(ax.flat):
         rowid = i // ncols
@@ -172,6 +211,9 @@ def result_printer(queryObj, returnObjs, queryInfo, returnInfos, dists):
             axes = plt.axes([0.5 - (btn_width/2.0), 0.665 - (bth_height/2.0), btn_width, bth_height])
             btn_info_main = Button(axes, 'Info')
             btn_info_main.on_clicked(btn_info(index = 0))
+            axes = plt.axes([0.57 - (btn_width/2.0), 0.665 - (bth_height/2.0), bth_height, bth_height])
+            btn_hist_main = Button(axes, '+')
+            btn_hist_main.on_clicked(btn_histograms(index = 0))
         elif rowid > 0:
             image = mpimg.imread("./temp_images/return_" + str(i-5) + ".png")
             axi.imshow(image)
@@ -184,9 +226,10 @@ def result_printer(queryObj, returnObjs, queryInfo, returnInfos, dists):
             btn = Button(axes, 'Info')
             btns_info.append(btn)
             btns_info[i-5].on_clicked(btn_info(index = i-4))
-
-
-
+            axes = plt.axes([0.57 - (btn_width/2.0) + (colid - float(ncols-1)/2.0)*0.195, 0.665 - (bth_height/2.0) - rowid * 0.32, bth_height, bth_height])
+            btn = Button(axes, '+')
+            btns_hist.append(btn)
+            btns_hist[i-5].on_clicked(btn_histograms(index = i-4))
 
     plt.tight_layout()
     plt.show()
@@ -239,16 +282,20 @@ if __name__ == "__main__":
 
     queryObj = path
     queryInfo = my_obj[['Area', 'Compactness', 'Regularity', 'Diameter', 'Convexity', 'Eccentricity']]
+    queryHist = my_obj[['A3', 'Bins A3', 'D1', 'Bins D1', 'D2', 'Bins D2', 'D3', 'Bins D3', 'D4', 'Bins D4']]
 
     returnObjs = []
     returnInfos = []
+    returnHists = []
     dists = []
     for i in range(10):
         returnObjs.append(path_to_db + "/" + distances[i]['Class'] + "/" + distances[i]['File'])
         returnInfos.append(distances_fancy.iloc[i][['Class', 'File', 'Distance', 'Area', 'Compactness', 'Regularity', 'Diameter', 'Convexity', 'Eccentricity']])
+        temp_hist = df.loc[df['File'] == distances_fancy.iloc[i]['File']][['A3', 'Bins A3', 'D1', 'Bins D1', 'D2', 'Bins D2', 'D3', 'Bins D3', 'D4', 'Bins D4']].squeeze(axis=0)
+        returnHists.append(temp_hist)
         dists.append(distances[i][['Distance']].astype(float))
 
-    result_printer(queryObj, returnObjs, queryInfo, returnInfos, dists)
+    result_printer(queryObj, returnObjs, queryInfo, returnInfos, queryHist, returnHists, dists)
 
     os.remove(path)
     os.rename(path + '.bak', path)
