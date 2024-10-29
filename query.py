@@ -81,14 +81,6 @@ def distance_between_features(features1: pd.Series, features2: pd.Series) -> flo
 
 def normalize_query(properties_list, df):
 
-    print(properties_list["Class"])
-    print(properties_list["File"])
-    print(properties_list["Area"])
-    print(df["Area"].mean())
-    print(df["Area"].std())
-    print((properties_list["Area"] - df["Area"].mean()) / df["Area"].std())
-    print(end)
-
     properties_list["Area"] = (properties_list["Area"] - df["Area"].mean()) / df["Area"].std()
     properties_list["Compactness"] = (properties_list["Compactness"] - df["Compactness"].mean()) / df["Compactness"].std()
     properties_list["Regularity"] = (properties_list["Regularity"] - df["Regularity"].mean()) / df["Regularity"].std()
