@@ -302,9 +302,27 @@ if __name__ == "__main__":
     elif sys.argv[1] == "--knn":
         with open("query.txt", "w") as f:
             row_to_string = f"{my_obj['Area']} {my_obj['Compactness']} {my_obj['Regularity']} {my_obj['Diameter']} {my_obj['Convexity']} {my_obj['Eccentricity']}"
+            A3 = my_obj['A3']
+            D1 = my_obj['D1']
+            D2 = my_obj['D2']
+            D3 = my_obj['D3']
+            D4 = my_obj['D4']
+            for i in A3:
+                row_to_string += f" {i}"
+            for i in D1:
+                row_to_string += f" {i}"
+            for i in D2:
+                row_to_string += f" {i}"
+            for i in D3:
+                row_to_string += f" {i}"
+            for i in D4:
+                row_to_string += f" {i}"
             f.write(row_to_string + "\n")
-        result = subprocess.run(["tools/ann_sample.exe", "-d", "6", "-max", "3000", "-nn", "20", "-df", "knn_data.txt", "-qf", "query.txt"], capture_output=True)
-        print(result.stdout.strip())
+        result = subprocess.run(["tools/ann_sample.exe", "-d", "236", "-max", "3000", "-nn", "20", "-df", "knn_data.txt", "-qf", "query.txt"], capture_output=True, text=True)
+        entries = result.stdout.strip().split('\n')
+        index_distance_pairs = [entry.split() for entry in entries]
+        for index, distance in index_distance_pairs:
+            print(f"Class: {df.at[int(index), 'Class']}, Name: {df.at[int(index), 'File']}, Distance: {distance}")
 
     os.remove(path)
     os.rename(path + '.bak', path)
