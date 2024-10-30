@@ -34,8 +34,12 @@ def shape_properties(shape: trimesh.Trimesh, obj_path: str):
     random_array_A3_1 = np.random.choice(range(len(shape.vertices)), ANALYSIS_VALUES_3, replace=True)
     random_array_A3_2 = np.random.choice(range(len(shape.vertices)), ANALYSIS_VALUES_3, replace=True)
     data_D1 = []
-    ANALYSIS_VALUES_1 = len(shape.vertices)
-    random_array_D1_0 = np.random.choice(range(len(shape.vertices)), ANALYSIS_VALUES_1, replace=False)
+    ANALYSIS_VALUES_1 = len(shape.vertices) + len(shape.triangles_center)
+    random_array_D1_0 = []
+    for i in range(len(shape.vertices)):
+        random_array_D1_0.append(shape.vertices[i])
+    for i in range(len(shape.triangles_center)):
+        random_array_D1_0.append(shape.triangles_center[i])
     data_D2 = []
     random_array_D2_0 = np.random.choice(range(len(shape.vertices)), ANALYSIS_VALUES_2, replace=True)
     random_array_D2_1 = np.random.choice(range(len(shape.vertices)), ANALYSIS_VALUES_2, replace=True)
@@ -54,7 +58,7 @@ def shape_properties(shape: trimesh.Trimesh, obj_path: str):
     ANALYSIS_VALUES = max(ANALYSIS_VALUES_1, ANALYSIS_VALUES_2, ANALYSIS_VALUES_3, ANALYSIS_VALUES_4)
     for i in range(ANALYSIS_VALUES):
         if i < ANALYSIS_VALUES_1:
-            D1_val = D1(shape.vertices[random_array_D1_0[i]])
+            D1_val = D1(random_array_D1_0[i])
             data_D1.append(D1_val)
         if i < ANALYSIS_VALUES_2 and (random_array_D2_0[i] != random_array_D2_1[i]):
             D2_val = D2(shape.vertices[random_array_D2_0[i]], shape.vertices[random_array_D2_1[i]])
@@ -122,18 +126,6 @@ def write_properties(db_path: str, output_path: str, big_db_name: str) -> None:
                 big_database.append(p)
                 
     big_df = pd.DataFrame(big_database, columns=["Class", "File", "Area", "Compactness", "Regularity", "Diameter", "Convexity", "Eccentricity", "A3", "Bins A3", "D1", "Bins D1", "D2", "Bins D2", "D3", "Bins D3", "D4", "Bins D4"])
-    print(f"Area mean: {big_df['Area'].mean()} std: {big_df['Area'].std()}")
-    print(f"Compactness mean: {big_df['Compactness'].mean()} std: {big_df['Compactness'].std()}")
-    print(f"Regularity mean: {big_df['Regularity'].mean()} std: {big_df['Regularity'].std()}")
-    print(f"Diameter mean: {big_df['Diameter'].mean()} std: {big_df['Diameter'].std()}")
-    print(f"Convexity mean: {big_df['Convexity'].mean()} std: {big_df['Convexity'].std()}")
-    print(f"Eccentricity mean: {big_df['Eccentricity'].mean()} std: {big_df['Eccentricity'].std()}")
-    big_df["Area"] = (big_df["Area"] - big_df["Area"].mean()) / big_df["Area"].std()
-    big_df["Compactness"] = (big_df["Compactness"] - big_df["Compactness"].mean()) / big_df["Compactness"].std()
-    big_df["Regularity"] = (big_df["Regularity"] - big_df["Regularity"].mean()) / big_df["Regularity"].std()
-    big_df["Diameter"] = (big_df["Diameter"] - big_df["Diameter"].mean()) / big_df["Diameter"].std()
-    big_df["Convexity"] = (big_df["Convexity"] - big_df["Convexity"].mean()) / big_df["Convexity"].std()
-    big_df["Eccentricity"] = (big_df["Eccentricity"] - big_df["Eccentricity"].mean()) / big_df["Eccentricity"].std()
     big_df.to_csv(output_path + "/" + big_db_name, index=False)
 
 #
