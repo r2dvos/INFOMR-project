@@ -4,14 +4,6 @@ import pandas as pd
 import numpy as np
 
 def normalize_database(data: pd.DataFrame):
-    print(f"Area mean: {data['Area'].mean()} std: {data['Area'].std()}")
-    print(f"Compactness mean: {data['Compactness'].mean()} std: {data['Compactness'].std()}")
-    print(f"Regularity mean: {data['Regularity'].mean()} std: {data['Regularity'].std()}")
-    print(f"Diameter mean: {data['Diameter'].mean()} std: {data['Diameter'].std()}")
-    print(f"Convexity mean: {data['Convexity'].mean()} std: {data['Convexity'].std()}")
-    print(f"Eccentricity mean: {data['Eccentricity'].mean()} std: {data['Eccentricity'].std()}")
-
-    # Normalize the data
     data['Area'] = (data['Area'] - data['Area'].mean()) / data['Area'].std()
     data['Compactness'] = (data['Compactness'] - data['Compactness'].mean()) / data['Compactness'].std()
     data['Regularity'] = (data['Regularity'] - data['Regularity'].mean()) / data['Regularity'].std()
@@ -32,15 +24,15 @@ def transform_data_for_knn(data: pd.DataFrame):
             D3 = current_row['D3']
             D4 = current_row['D4']
             for i in range(0, len(A3)):
-                row_to_string += f" {A3[i]}"
+                row_to_string += f" {np.format_float_positional(A3[i], trim='-')}"
             for i in range(0, len(D1)):
-                row_to_string += f" {D1[i]}"
+                row_to_string += f" {np.format_float_positional(D1[i], trim='-')}"
             for i in range(0, len(D2)):
-                row_to_string += f" {D2[i]}"
+                row_to_string += f" {np.format_float_positional(D2[i], trim='-')}"
             for i in range(0, len(D3)):
-                row_to_string += f" {D3[i]}"
+                row_to_string += f" {np.format_float_positional(D3[i], trim='-')}"
             for i in range(0, len(D4)):
-                row_to_string += f" {D4[i]}"
+                row_to_string += f" {np.format_float_positional(D4[i], trim='-')}"
             f.write(row_to_string + "\n")
 
 if __name__ == "__main__":

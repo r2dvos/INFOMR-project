@@ -55,17 +55,17 @@ def earth_movers_distance(dirt: np.ndarray, holes: np.ndarray) -> float:
     return tot_work
 
 def distance_between_features(features1: pd.Series, features2: pd.Series) -> float:
-    weight_A3 = 1
-    weight_D1 = 1
-    weight_D2 = 1
-    weight_D3 = 1
-    weight_D4 = 1
-    weight_area = 1
-    weight_comapctness = 1
-    weight_regularity = 1
-    weight_diameter = 1
-    weight_convexity = 1
-    weight_eccentricity = 1
+    weight_A3 = 1.3
+    weight_D1 = 0.7
+    weight_D2 = 1.3
+    weight_D3 = 1.3
+    weight_D4 = 1.3
+    weight_area = 0.3
+    weight_comapctness = 1.1
+    weight_regularity = 1.1
+    weight_diameter = 0.3
+    weight_convexity = 1.1
+    weight_eccentricity = 1.1
 
     A3_dist = earth_movers_distance(features1['A3'], features2['A3']) * weight_A3
     D1_dist = earth_movers_distance(features1['D1'], features2['D1']) * weight_D1
@@ -318,11 +318,25 @@ if __name__ == "__main__":
             for i in D4:
                 row_to_string += f" {i}"
             f.write(row_to_string + "\n")
-        result = subprocess.run(["tools/ann_sample.exe", "-d", "236", "-max", "3000", "-nn", "20", "-df", "knn_data.txt", "-qf", "query.txt"], capture_output=True, text=True)
+        result = subprocess.run(["tools/ann_sample.exe", "-d", "236", "-max", "3000", "-nn", "10", "-df", "knn_data.txt", "-qf", "query.txt"], capture_output=True, text=True)
         entries = result.stdout.strip().split('\n')
         index_distance_pairs = [entry.split() for entry in entries]
+        returnObjs = []
+        returnInfos = []
+        returnHists = []
+        distances = [float(entry[1]) for entry in index_distance_pairs]
         for index, distance in index_distance_pairs:
-            print(f"Class: {df.at[int(index), 'Class']}, Name: {df.at[int(index), 'File']}, Distance: {distance}")
+            returnObjs.append(path_to_db + "/" + df.at[int(index), 'Class'] + "/" + df.at[int(index), 'File'])
+            row = df.iloc[int(index)][['Class', 'File', 'Area', 'Compactness', 'Regularity', 'Diameter', 'Convexity', 'Eccentricity']]
+            distance_series = pd.Series({'Distance': float(distance)})
+            row_with_distance = pd.concat([row, distance_series])
+            returnInfos.append(row_with_distance)
+            temp_hist = df.loc[df['File'] == df.iloc[int(index)]['File']][['A3', 'Bins A3', 'D1', 'Bins D1', 'D2', 'Bins D2', 'D3', 'Bins D3', 'D4', 'Bins D4']].squeeze(axis=0)
+            returnHists.append(temp_hist)
+            print(f"Tested {index} with distance {distance}. Name: {df.at[int(index), 'File']} in class {df.at[int(index), 'Class']}")
+        queryInfo = my_obj[['Area', 'Compactness', 'Regularity', 'Diameter', 'Convexity', 'Eccentricity']]
+        queryHist = my_obj[['A3', 'Bins A3', 'D1', 'Bins D1', 'D2', 'Bins D2', 'D3', 'Bins D3', 'D4', 'Bins D4']]
+        result_printer(path, returnObjs, queryInfo, returnInfos, queryHist, returnHists, distances)
 
     os.remove(path)
     os.rename(path + '.bak', path)
