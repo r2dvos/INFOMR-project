@@ -253,6 +253,7 @@ if __name__ == "__main__":
     full_refine(path, 1, True)
     obj = trimesh.load_mesh(path)
     obj = normalize_shape(obj)
+    obj.export(path)
     df = pd.read_csv("database.csv")
     df_no_norm = pd.read_csv("database_no_norm.csv")
 
@@ -333,7 +334,6 @@ if __name__ == "__main__":
             returnInfos.append(row_with_distance)
             temp_hist = df.loc[df['File'] == df.iloc[int(index)]['File']][['A3', 'Bins A3', 'D1', 'Bins D1', 'D2', 'Bins D2', 'D3', 'Bins D3', 'D4', 'Bins D4']].squeeze(axis=0)
             returnHists.append(temp_hist)
-            print(f"Tested {index} with distance {distance}. Name: {df.at[int(index), 'File']} in class {df.at[int(index), 'Class']}")
         queryInfo = my_obj[['Area', 'Compactness', 'Regularity', 'Diameter', 'Convexity', 'Eccentricity']]
         queryHist = my_obj[['A3', 'Bins A3', 'D1', 'Bins D1', 'D2', 'Bins D2', 'D3', 'Bins D3', 'D4', 'Bins D4']]
         result_printer(path, returnObjs, queryInfo, returnInfos, queryHist, returnHists, distances)
