@@ -122,7 +122,7 @@ def tsne(X=np.array([]), no_dims=2, initial_dims=50, perplexity=30.0):
     # Initialize variables
     X = pca(X, initial_dims).real
     (n, d) = X.shape
-    max_iter = 1000
+    max_iter = 500
     initial_momentum = 0.5
     final_momentum = 0.8
     eta = 500
@@ -182,9 +182,10 @@ def tsne(X=np.array([]), no_dims=2, initial_dims=50, perplexity=30.0):
 
 if __name__ == "__main__":
     print("Run Y = tsne.tsne(X, no_dims, perplexity) to perform t-SNE on your dataset.")
-    print("Running example on 2,500 MNIST digits...")
-    X = np.loadtxt("knn_data.txt")
-    labels = np.loadtxt("mnist2500_labels.txt")
-    Y = tsne(X, 2, 6, 20.0)
+    X = np.loadtxt("knn_data_copy.txt")
+    labels = np.loadtxt("knn_labels_copy.txt")
+    #X = np.loadtxt("mnist2500_X.txt")
+    #labels = np.loadtxt("mnist2500_labels.txt")
+    Y = tsne(X, 2, 50, 30.0)
     pylab.scatter(Y[:, 0], Y[:, 1], 20, labels)
     pylab.show()
