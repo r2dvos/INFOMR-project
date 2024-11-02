@@ -13,7 +13,8 @@
 #  Copyright (c) 2008 Tilburg University. All rights reserved.
 
 import numpy as np
-import pylab
+import matplotlib.pyplot as plt
+import mpld3
 
 
 def Hbeta(D=np.array([]), beta=1.0):
@@ -122,7 +123,7 @@ def tsne(X=np.array([]), no_dims=2, initial_dims=50, perplexity=30.0):
     # Initialize variables
     X = pca(X, initial_dims).real
     (n, d) = X.shape
-    max_iter = 500
+    max_iter = 1000
     initial_momentum = 0.5
     final_momentum = 0.8
     eta = 500
@@ -184,8 +185,17 @@ if __name__ == "__main__":
     print("Run Y = tsne.tsne(X, no_dims, perplexity) to perform t-SNE on your dataset.")
     X = np.loadtxt("knn_data_copy.txt")
     labels = np.loadtxt("knn_labels_copy.txt")
-    #X = np.loadtxt("mnist2500_X.txt")
-    #labels = np.loadtxt("mnist2500_labels.txt")
+
+    labels_hover = []
+    with open('knn_labels_hover_data.txt', 'r') as file:
+        for line in file:
+            labels_hover.append(line.strip())
+
+    fig, ax = plt.subplots()
     Y = tsne(X, 2, 50, 30.0)
-    pylab.scatter(Y[:, 0], Y[:, 1], 20, labels)
-    pylab.show()
+    scatter = ax.scatter(Y[:, 0], Y[:, 1], 20, labels)
+
+    tooltip = mpld3.plugins.PointLabelTooltip(scatter, labels=labels_hover)
+    mpld3.plugins.connect(fig, tooltip)
+
+    mpld3.show()
