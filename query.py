@@ -6,6 +6,7 @@ import trimesh
 import os
 import sys
 import subprocess
+import time
 
 from pathlib import Path
 import matplotlib.pyplot as plt
@@ -257,6 +258,8 @@ if __name__ == "__main__":
     df = pd.read_csv("database.csv")
     df_no_norm = pd.read_csv("database_no_norm.csv")
 
+    start_time = time.time()
+
     properties = shape_properties(obj, path)[0]
     properties_list = list(properties)
     properties_list.insert(0, "padding")
@@ -299,6 +302,8 @@ if __name__ == "__main__":
             returnHists.append(temp_hist)
             dists.append(distances[i][['Distance']].astype(float))
 
+        end_time = time.time()
+        print(f"Time elapsed: {end_time - start_time}")
         result_printer(queryObj, returnObjs, queryInfo, returnInfos, queryHist, returnHists, dists)
     elif sys.argv[1] == "--knn":
         with open("query.txt", "w") as f:
@@ -336,6 +341,8 @@ if __name__ == "__main__":
             returnHists.append(temp_hist)
         queryInfo = my_obj[['Area', 'Compactness', 'Regularity', 'Diameter', 'Convexity', 'Eccentricity']]
         queryHist = my_obj[['A3', 'Bins A3', 'D1', 'Bins D1', 'D2', 'Bins D2', 'D3', 'Bins D3', 'D4', 'Bins D4']]
+        end_time = time.time()
+        print(f"Time elapsed: {end_time - start_time}")
         result_printer(path, returnObjs, queryInfo, returnInfos, queryHist, returnHists, distances)
 
     os.remove(path)
