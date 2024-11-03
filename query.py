@@ -243,107 +243,148 @@ def result_printer(queryObj, returnObjs, queryInfo, returnInfos, queryHist, retu
 
 ###########################################################################################################################################################
 
-
-if __name__ == "__main__":
-    root = tk.Tk()
-    root.withdraw()
-
-    path_to_db = "../ShapeDatabase_INFOMR"
-
-    path = tk.filedialog.askopenfilename(initialdir = path_to_db)
-    full_refine(path, 1, True)
-    obj = trimesh.load_mesh(path)
-    obj = normalize_shape(obj)
-    obj.export(path)
-    df = pd.read_csv("database.csv")
-    df_no_norm = pd.read_csv("database_no_norm.csv")
-
+def search_normal(my_obj, df):
     start_time = time.time()
-
-    properties = shape_properties(obj, path)[0]
-    properties_list = list(properties)
-    properties_list.insert(0, "padding")
-    properties_list.insert(0, "padding")
-    properties = tuple(properties_list)
-    
-    column_headers = df.columns
-    my_obj = pd.Series(properties, index=column_headers)
-    my_obj = normalize_query(my_obj, df_no_norm)
     distances = []
+    for i in range(0, len(df)):
+        entry = (df.iloc[i]['Class'], df.iloc[i]['File'], distance_between_features(my_obj, df.iloc[i]), df.iloc[i]['Area'], df.iloc[i]['Compactness'], df.iloc[i]['Regularity'], df.iloc[i]['Diameter'], df.iloc[i]['Convexity'], df.iloc[i]['Eccentricity'])
+        distances.append(entry)
+    distances = np.array(distances, dtype=[('Class', 'U20'), ('File', 'U10'), ('Distance', float), ('Area', float), ('Compactness', float), ('Regularity', float), ('Diameter', float), ('Convexity', float), ('Eccentricity', float)])
+    distances = np.sort(distances, order='Distance')
+    distances_fancy = pd.DataFrame(data = distances)
 
+    queryInfo = my_obj[['Area', 'Compactness', 'Regularity', 'Diameter', 'Convexity', 'Eccentricity']]
+    queryHist = my_obj[['A3', 'Bins A3', 'D1', 'Bins D1', 'D2', 'Bins D2', 'D3', 'Bins D3', 'D4', 'Bins D4']]
+
+    returnObjs = []
+    returnInfos = []
+    returnHists = []
+    dists = []
+    for i in range(10):
+        returnObjs.append("../ShapeDatabase_INFOMR" + "/" + distances[i]['Class'] + "/" + distances[i]['File'])
+        returnInfos.append(distances_fancy.iloc[i][['Class', 'File', 'Distance', 'Area', 'Compactness', 'Regularity', 'Diameter', 'Convexity', 'Eccentricity']])
+        temp_hist = df.loc[df['File'] == distances_fancy.iloc[i]['File']][['A3', 'Bins A3', 'D1', 'Bins D1', 'D2', 'Bins D2', 'D3', 'Bins D3', 'D4', 'Bins D4']].squeeze(axis=0)
+        returnHists.append(temp_hist)
+        dists.append(distances[i][['Distance']].astype(float))
+
+    end_time = time.time()
+    print(f"Time elapsed: {end_time - start_time}")
+    return (returnObjs, queryInfo, returnInfos, queryHist, returnHists, dists)
+
+def search_knn(my_obj, df):
+    start_time = time.time()
+    with open("query.txt", "w") as f:
+        row_to_string = f"{my_obj['Area']} {my_obj['Compactness']} {my_obj['Regularity']} {my_obj['Diameter']} {my_obj['Convexity']} {my_obj['Eccentricity']}"
+        A3 = my_obj['A3']
+        D1 = my_obj['D1']
+        D2 = my_obj['D2']
+        D3 = my_obj['D3']
+        D4 = my_obj['D4']
+        for i in A3:
+            row_to_string += f" {i}"
+        for i in D1:
+            row_to_string += f" {i}"
+        for i in D2:
+            row_to_string += f" {i}"
+        for i in D3:
+            row_to_string += f" {i}"
+        for i in D4:
+            row_to_string += f" {i}"
+        f.write(row_to_string + "\n")
+    result = subprocess.run(["tools/ann_sample.exe", "-d", "236", "-max", "3000", "-nn", "10", "-df", "knn_data.txt", "-qf", "query.txt"], capture_output=True, text=True)
+    entries = result.stdout.strip().split('\n')
+    index_distance_pairs = [entry.split() for entry in entries]
+    returnObjs = []
+    returnInfos = []
+    returnHists = []
+    distances = [float(entry[1]) for entry in index_distance_pairs]
+    for index, distance in index_distance_pairs:
+        returnObjs.append("../ShapeDatabase_INFOMR" + "/" + df.at[int(index), 'Class'] + "/" + df.at[int(index), 'File'])
+        row = df.iloc[int(index)][['Class', 'File', 'Area', 'Compactness', 'Regularity', 'Diameter', 'Convexity', 'Eccentricity']]
+        distance_series = pd.Series({'Distance': float(distance)})
+        row_with_distance = pd.concat([row, distance_series])
+        returnInfos.append(row_with_distance)
+        temp_hist = df.loc[df['File'] == df.iloc[int(index)]['File']][['A3', 'Bins A3', 'D1', 'Bins D1', 'D2', 'Bins D2', 'D3', 'Bins D3', 'D4', 'Bins D4']].squeeze(axis=0)
+        returnHists.append(temp_hist)
+    queryInfo = my_obj[['Area', 'Compactness', 'Regularity', 'Diameter', 'Convexity', 'Eccentricity']]
+    queryHist = my_obj[['A3', 'Bins A3', 'D1', 'Bins D1', 'D2', 'Bins D2', 'D3', 'Bins D3', 'D4', 'Bins D4']]
+    end_time = time.time()
+    print(f"Time elapsed: {end_time - start_time}")
+    return (returnObjs, queryInfo, returnInfos, queryHist, returnHists, distances)
+    
+if __name__ == "__main__":
+    # Load database
+    df = pd.read_csv("database.csv")
     for i in range(0, len(df)):
         df.at[i, 'A3'] = np.fromstring(df.at[i, 'A3'][1:-1], sep=', ')
         df.at[i, 'D1'] = np.fromstring(df.at[i, 'D1'][1:-1], sep=', ')
         df.at[i, 'D2'] = np.fromstring(df.at[i, 'D2'][1:-1], sep=', ')
         df.at[i, 'D3'] = np.fromstring(df.at[i, 'D3'][1:-1], sep=', ')
         df.at[i, 'D4'] = np.fromstring(df.at[i, 'D4'][1:-1], sep=', ')
+    df_no_norm = pd.read_csv("database_no_norm.csv")
 
     if sys.argv[1] == "--normal":
-        for i in range(0, len(df)):
-            entry = (df.iloc[i]['Class'], df.iloc[i]['File'], distance_between_features(my_obj, df.iloc[i]), df.iloc[i]['Area'], df.iloc[i]['Compactness'], df.iloc[i]['Regularity'], df.iloc[i]['Diameter'], df.iloc[i]['Convexity'], df.iloc[i]['Eccentricity'])
-            distances.append(entry)
-            print(f"Tested {i}")
-        distances = np.array(distances, dtype=[('Class', 'U20'), ('File', 'U10'), ('Distance', float), ('Area', float), ('Compactness', float), ('Regularity', float), ('Diameter', float), ('Convexity', float), ('Eccentricity', float)])
-        distances = np.sort(distances, order='Distance')
-        distances_fancy = pd.DataFrame(data = distances)
-
-        queryObj = path
-        queryInfo = my_obj[['Area', 'Compactness', 'Regularity', 'Diameter', 'Convexity', 'Eccentricity']]
-        queryHist = my_obj[['A3', 'Bins A3', 'D1', 'Bins D1', 'D2', 'Bins D2', 'D3', 'Bins D3', 'D4', 'Bins D4']]
-
-        returnObjs = []
-        returnInfos = []
-        returnHists = []
-        dists = []
-        for i in range(10):
-            returnObjs.append(path_to_db + "/" + distances[i]['Class'] + "/" + distances[i]['File'])
-            returnInfos.append(distances_fancy.iloc[i][['Class', 'File', 'Distance', 'Area', 'Compactness', 'Regularity', 'Diameter', 'Convexity', 'Eccentricity']])
-            temp_hist = df.loc[df['File'] == distances_fancy.iloc[i]['File']][['A3', 'Bins A3', 'D1', 'Bins D1', 'D2', 'Bins D2', 'D3', 'Bins D3', 'D4', 'Bins D4']].squeeze(axis=0)
-            returnHists.append(temp_hist)
-            dists.append(distances[i][['Distance']].astype(float))
-
-        end_time = time.time()
-        print(f"Time elapsed: {end_time - start_time}")
-        result_printer(queryObj, returnObjs, queryInfo, returnInfos, queryHist, returnHists, dists)
+        root = tk.Tk()
+        root.withdraw()
+        path = tk.filedialog.askopenfilename(initialdir = "../ShapeDatabase_INFOMR")
+        # Fix obj file
+        full_refine(path, 1, True)
+        obj = trimesh.load_mesh(path)
+        obj = normalize_shape(obj)
+        obj.export(path)
+        properties = shape_properties(obj, path)[0]
+        properties_list = list(properties)
+        properties_list.insert(0, "padding")
+        properties_list.insert(0, "padding")
+        properties = tuple(properties_list)
+        column_headers = df.columns
+        my_obj = pd.Series(properties, index=column_headers)
+        my_obj = normalize_query(my_obj, df_no_norm)
+        (returnObjs, queryInfo, returnInfos, queryHist, returnHists, dists) = search_normal(my_obj, df)
+        result_printer(path, returnObjs, queryInfo, returnInfos, queryHist, returnHists, dists)
     elif sys.argv[1] == "--knn":
-        with open("query.txt", "w") as f:
-            row_to_string = f"{my_obj['Area']} {my_obj['Compactness']} {my_obj['Regularity']} {my_obj['Diameter']} {my_obj['Convexity']} {my_obj['Eccentricity']}"
-            A3 = my_obj['A3']
-            D1 = my_obj['D1']
-            D2 = my_obj['D2']
-            D3 = my_obj['D3']
-            D4 = my_obj['D4']
-            for i in A3:
-                row_to_string += f" {i}"
-            for i in D1:
-                row_to_string += f" {i}"
-            for i in D2:
-                row_to_string += f" {i}"
-            for i in D3:
-                row_to_string += f" {i}"
-            for i in D4:
-                row_to_string += f" {i}"
-            f.write(row_to_string + "\n")
-        result = subprocess.run(["tools/ann_sample.exe", "-d", "236", "-max", "3000", "-nn", "10", "-df", "knn_data.txt", "-qf", "query.txt"], capture_output=True, text=True)
-        entries = result.stdout.strip().split('\n')
-        index_distance_pairs = [entry.split() for entry in entries]
-        returnObjs = []
-        returnInfos = []
-        returnHists = []
-        distances = [float(entry[1]) for entry in index_distance_pairs]
-        for index, distance in index_distance_pairs:
-            returnObjs.append(path_to_db + "/" + df.at[int(index), 'Class'] + "/" + df.at[int(index), 'File'])
-            row = df.iloc[int(index)][['Class', 'File', 'Area', 'Compactness', 'Regularity', 'Diameter', 'Convexity', 'Eccentricity']]
-            distance_series = pd.Series({'Distance': float(distance)})
-            row_with_distance = pd.concat([row, distance_series])
-            returnInfos.append(row_with_distance)
-            temp_hist = df.loc[df['File'] == df.iloc[int(index)]['File']][['A3', 'Bins A3', 'D1', 'Bins D1', 'D2', 'Bins D2', 'D3', 'Bins D3', 'D4', 'Bins D4']].squeeze(axis=0)
-            returnHists.append(temp_hist)
-        queryInfo = my_obj[['Area', 'Compactness', 'Regularity', 'Diameter', 'Convexity', 'Eccentricity']]
-        queryHist = my_obj[['A3', 'Bins A3', 'D1', 'Bins D1', 'D2', 'Bins D2', 'D3', 'Bins D3', 'D4', 'Bins D4']]
-        end_time = time.time()
-        print(f"Time elapsed: {end_time - start_time}")
+        root = tk.Tk()
+        root.withdraw()
+        path = tk.filedialog.askopenfilename(initialdir = "../ShapeDatabase_INFOMR")
+        # Fix obj file
+        full_refine(path, 1, True)
+        obj = trimesh.load_mesh(path)
+        obj = normalize_shape(obj)
+        obj.export(path)
+        properties = shape_properties(obj, path)[0]
+        properties_list = list(properties)
+        properties_list.insert(0, "padding")
+        properties_list.insert(0, "padding")
+        properties = tuple(properties_list)
+        column_headers = df.columns
+        my_obj = pd.Series(properties, index=column_headers)
+        my_obj = normalize_query(my_obj, df_no_norm)
+        (returnObjs, queryInfo, returnInfos, queryHist, returnHists, distances) = search_knn(my_obj, df)
         result_printer(path, returnObjs, queryInfo, returnInfos, queryHist, returnHists, distances)
+    elif sys.argv[1] == "--all":
+        with open("results.txt", "w") as f:
+            for root, _, files in os.walk(sys.argv[2]):
+                for file in files:
+                    if file.endswith('.obj'):
+                        full_path = os.path.join(root, file)
+                        obj = trimesh.load_mesh(full_path)
+                        properties = shape_properties(obj, full_path)[0]
+                        properties_list = list(properties)
+                        properties_list.insert(0, "padding")
+                        properties_list.insert(0, "padding")
+                        properties = tuple(properties_list)
+
+                        column_headers = df.columns
+                        my_obj = pd.Series(properties, index=column_headers)
+                        my_obj = normalize_query(my_obj, df_no_norm)
+
+                        (_, queryInfo, returnInfos, _, _, _) = search_knn(my_obj, df)
+                        correctClasses = 0
+                        currentClass = os.path.basename(os.path.dirname(full_path))
+                        for info in returnInfos:
+                            if info['Class'] == currentClass:
+                                correctClasses += 1
+                        f.write(f"{currentClass}; {file}; {correctClasses};\n")
 
     os.remove(path)
     os.rename(path + '.bak', path)
