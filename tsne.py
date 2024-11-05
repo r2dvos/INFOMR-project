@@ -193,9 +193,11 @@ if __name__ == "__main__":
 
     fig, ax = plt.subplots()
     Y = tsne(X, 2, 50, 30.0)
-    scatter = ax.scatter(Y[:, 0], Y[:, 1], 20, labels)
 
+    #plt.scatter(Y[:, 0], Y[:, 1], 20, labels, cmap='tab20')
+    #plt.show()
+
+    scatter = ax.scatter(Y[:, 0], Y[:, 1], 20, labels, cmap='tab20')
     tooltip = mpld3.plugins.PointLabelTooltip(scatter, labels=labels_hover)
     mpld3.plugins.connect(fig, tooltip)
-
     mpld3.show()
