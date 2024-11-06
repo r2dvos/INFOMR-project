@@ -260,7 +260,7 @@ def search_normal(my_obj, df, test=False):
     returnInfos = []
     returnHists = []
     dists = []
-    for i in range(2483):
+    for i in range(10):
         returnInfos.append(distances_fancy.iloc[i][['Class', 'File', 'Distance', 'Area', 'Compactness', 'Regularity', 'Diameter', 'Convexity', 'Eccentricity']])
         if not test:
             returnObjs.append("../ShapeDatabase_INFOMR" + "/" + distances[i]['Class'] + "/" + distances[i]['File'])
@@ -269,8 +269,7 @@ def search_normal(my_obj, df, test=False):
             dists.append(distances[i][['Distance']].astype(float))
 
     end_time = time.time()
-    print(f"Time elapsed: {end_time - start_time}")
-    return (returnObjs, queryInfo, returnInfos, queryHist, returnHists, dists)
+    return (returnObjs, queryInfo, returnInfos, queryHist, returnHists, dists, end_time - start_time)
 
 def search_knn(my_obj, df, test = False):
     start_time = time.time()
@@ -311,8 +310,7 @@ def search_knn(my_obj, df, test = False):
     queryInfo = my_obj[['Area', 'Compactness', 'Regularity', 'Diameter', 'Convexity', 'Eccentricity']]
     queryHist = my_obj[['A3', 'Bins A3', 'D1', 'Bins D1', 'D2', 'Bins D2', 'D3', 'Bins D3', 'D4', 'Bins D4']]
     end_time = time.time()
-    print(f"Time elapsed: {end_time - start_time}")
-    return (returnObjs, queryInfo, returnInfos, queryHist, returnHists, distances)
+    return (returnObjs, queryInfo, returnInfos, queryHist, returnHists, distances, end_time - start_time)
     
 if __name__ == "__main__":
     # Load database
@@ -342,7 +340,7 @@ if __name__ == "__main__":
         column_headers = df.columns
         my_obj = pd.Series(properties, index=column_headers)
         my_obj = normalize_query(my_obj, df_no_norm)
-        (returnObjs, queryInfo, returnInfos, queryHist, returnHists, dists) = search_normal(my_obj, df)
+        (returnObjs, queryInfo, returnInfos, queryHist, returnHists, dists, _) = search_normal(my_obj, df)
         result_printer(path, returnObjs, queryInfo, returnInfos, queryHist, returnHists, dists)
     elif sys.argv[1] == "--knn":
         root = tk.Tk()
@@ -361,22 +359,24 @@ if __name__ == "__main__":
         column_headers = df.columns
         my_obj = pd.Series(properties, index=column_headers)
         my_obj = normalize_query(my_obj, df_no_norm)
-        (returnObjs, queryInfo, returnInfos, queryHist, returnHists, distances) = search_knn(my_obj, df)
+        (returnObjs, queryInfo, returnInfos, queryHist, returnHists, distances, _) = search_knn(my_obj, df)
         result_printer(path, returnObjs, queryInfo, returnInfos, queryHist, returnHists, distances)
     elif sys.argv[1] == "--all":
         with open("results.txt", "w") as f:
-            for i in range(len(df)):
-                properties = df.iloc[i]
-                (_, _, returnInfos, _, _, _) = search_normal(properties, df, True)
-                currentClass = properties['Class']
-                same_class = 0
-                f.write(f"{currentClass};")
-                for idx, info in enumerate(returnInfos):
-                    if info['Class'] == currentClass:
-                        same_class += 1
-                    f.write(f"{same_class};")
-                f.write("\n")
-                print(f"Class {currentClass} done.")
+            sampled_df = df.groupby('Class').apply(lambda x: x.sample(min(len(x), 5))).reset_index(drop=True)
+            for i in range(len(sampled_df)):
+                properties = sampled_df.iloc[i]
+                (_, _, _, _, _, _, time1) = search_knn(properties, df, True)
+                (_, _, _, _, _, _, time2) = search_normal(properties, df, True)
+                f.write(f"{properties['Class']};{properties['File']};{time1};{time2};\n")
+                #currentClass = properties['Class']
+                #same_class = 0
+                #last_rank = -1
+                #for idx, info in enumerate(returnInfos):
+                #    if info['Class'] == currentClass:
+                #        last_rank = idx + 1
+                #f.write(f"{currentClass};{properties['File']};{last_rank};\n")
+                #print(f"Class {currentClass} done.")
                 #correctClasses = 0
                 #for info in returnInfos:
                 #    if info['Class'] == currentClass:
