@@ -249,7 +249,7 @@ def search_normal(my_obj, df, test=False):
     for i in range(0, len(df)):
         entry = (df.iloc[i]['Class'], df.iloc[i]['File'], distance_between_features(my_obj, df.iloc[i]), df.iloc[i]['Area'], df.iloc[i]['Compactness'], df.iloc[i]['Regularity'], df.iloc[i]['Diameter'], df.iloc[i]['Convexity'], df.iloc[i]['Eccentricity'])
         distances.append(entry)
-    distances = np.array(distances, dtype=[('Class', 'U20'), ('File', 'U10'), ('Distance', float), ('Area', float), ('Compactness', float), ('Regularity', float), ('Diameter', float), ('Convexity', float), ('Eccentricity', float)])
+    distances = np.array(distances, dtype=[('Class', 'U25'), ('File', 'U10'), ('Distance', float), ('Area', float), ('Compactness', float), ('Regularity', float), ('Diameter', float), ('Convexity', float), ('Eccentricity', float)])
     distances = np.sort(distances, order='Distance')
     distances_fancy = pd.DataFrame(data = distances)
 
